@@ -1,5 +1,6 @@
 import type { RawIdea, Idea, CrawlStats } from '../types'
 import { categorize } from '../categorize'
+import { filterAds } from '../filter'
 import { crawlV2EX } from './v2ex'
 import { crawlHackerNews } from './hackernews'
 import { crawlProductHunt } from './producthunt'
@@ -43,8 +44,12 @@ export async function crawlAll(): Promise<CrawlResult> {
     }
   })
   
+  // Filter ads
+  const filteredIdeas = filterAds(allRawIdeas)
+  const filteredCount = allRawIdeas.length - filteredIdeas.length
+  
   // Convert RawIdea → Idea with categorization and unique IDs
-  const ideas: Idea[] = allRawIdeas.map((raw, index) => {
+  const ideas: Idea[] = filteredIdeas.map((raw, index) => {
     const category = categorize(raw.title, raw.description)
     return {
       id: `idea_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`,
@@ -59,7 +64,8 @@ export async function crawlAll(): Promise<CrawlResult> {
   })
   
   const stats: CrawlStats = {
-    totalFetched: ideas.length,
+    totalFetched: allRawIdeas.length,
+    filteredCount,
     byPlatform,
     collectionsFormed: 0,
     errors,

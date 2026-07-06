@@ -76,6 +76,7 @@ export interface CrawlResponse {
 
 export interface CrawlStats {
   totalFetched: number
+  filteredCount: number
   byPlatform: Record<string, number>
   collectionsFormed: number
   errors: string[]
