@@ -1,40 +1,68 @@
-import { search } from '@/lib/store'
+'use client'
+
+import { Suspense, useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import SearchBar from '@/components/SearchBar'
 import IdeaCard from '@/components/IdeaCard'
 import CollectionCard from '@/components/CollectionCard'
 import Link from 'next/link'
+import type { Idea, Collection } from '@/lib/types'
 
-interface Props {
-  searchParams: { q?: string }
-}
+const CACHE_KEY = 'ideahub_cache'
 
-export const dynamic = 'force-dynamic'
+function SearchContent() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q') || ''
+  const [ideas, setIdeas] = useState<Idea[]>([])
+  const [collections, setCollections] = useState<Collection[]>([])
+  const [loading, setLoading] = useState(true)
 
-export function generateMetadata({ searchParams }: Props) {
-  return { title: `${searchParams.q || '搜索'} - IdeaHub` }
-}
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const data = JSON.parse(cached)
+        setIdeas(data.ideas || [])
+        setCollections(data.collections || [])
+      }
+    } catch {}
+    setLoading(false)
+  }, [])
 
-export default async function SearchPage({ searchParams }: Props) {
-  const query = searchParams.q || ''
-  const results = query ? await search(query) : { results: [], total: 0 }
+  const results = useMemo(() => {
+    if (!query.trim()) return { ideas: [], collections: [] }
+    const q = query.toLowerCase().trim()
+    return {
+      ideas: ideas.filter(i =>
+        i.title.toLowerCase().includes(q) ||
+        i.description.toLowerCase().includes(q) ||
+        i.category.toLowerCase().includes(q)
+      ),
+      collections: collections.filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        c.summary.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q)
+      ),
+    }
+  }, [query, ideas, collections])
+
+  const total = results.ideas.length + results.collections.length
 
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-          搜索需求
-        </h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-4">搜索需求</h1>
         <SearchBar initialQuery={query} autoFocus={!query} />
       </div>
 
       {query && (
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            找到 <span className="font-semibold text-gray-900 dark:text-gray-100">{results.total}</span> 条与
+            找到 <span className="font-semibold text-gray-900 dark:text-gray-100">{total}</span> 条与
             「<span className="font-semibold text-gray-900 dark:text-gray-100">{query}</span>」相关的结果
           </p>
 
-          {results.total === 0 ? (
+          {total === 0 ? (
             <div className="py-20 text-center">
               <p className="text-4xl mb-4">🔍</p>
               <p className="text-gray-400 dark:text-gray-500">没有找到相关需求</p>
@@ -45,20 +73,12 @@ export default async function SearchPage({ searchParams }: Props) {
             </div>
           ) : (
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
-              {results.results.map((item: any) =>
-                item.type === 'collection' ? (
-                  <CollectionCard key={item.id} collection={{
-                    id: item.id,
-                    title: item.title,
-                    summary: item.summary,
-                    category: item.category,
-                    ideaIds: [],
-                    createdAt: new Date().toISOString(),
-                  }} />
-                ) : (
-                  <IdeaCard key={item.id} idea={item} />
-                )
-              )}
+              {results.collections.map(c => (
+                <CollectionCard key={`col-${c.id}`} collection={c} />
+              ))}
+              {results.ideas.map(i => (
+                <IdeaCard key={`idea-${i.id}`} idea={i} />
+              ))}
             </div>
           )}
         </div>
@@ -82,5 +102,25 @@ export default async function SearchPage({ searchParams }: Props) {
         </div>
       )}
     </div>
+  )
+}
+
+export default function SearchPage() {
+  if (typeof window === 'undefined') {
+    return (
+      <div className="py-20 text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+      </div>
+    )
+  }
+
+  return (
+    <Suspense fallback={
+      <div className="py-20 text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   )
 }

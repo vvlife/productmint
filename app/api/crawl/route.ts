@@ -4,12 +4,32 @@ import { triggerCrawl, getLastCrawlTime } from '@/lib/store'
 export const dynamic = 'force-dynamic'
 
 export async function POST() {
-  const result = await triggerCrawl()
-  return NextResponse.json(result, { status: result.success ? 200 : 500 })
+  try {
+    const result = await triggerCrawl()
+    // Return ideas + collections + meta so frontend can cache
+    return NextResponse.json({
+      success: true,
+      message: result.response.message,
+      crawledAt: result.response.crawledAt,
+      newItems: result.response.newItems,
+      stats: result.response.stats,
+      ideas: result.ideas,
+      collections: result.collections,
+    })
+  } catch (error: any) {
+    return NextResponse.json({
+      success: false,
+      message: `Crawl failed: ${error?.message || 'unknown error'}`,
+      crawledAt: new Date().toISOString(),
+      newItems: 0,
+      ideas: [],
+      collections: [],
+    }, { status: 500 })
+  }
 }
 
 export async function GET() {
-  const lastCrawlAt = await getLastCrawlTime()
+  const lastCrawlAt = getLastCrawlTime()
   return NextResponse.json({
     success: true,
     lastCrawlAt,
