@@ -96,3 +96,32 @@ export interface StorageData {
   collections: Collection[]
   lastCrawlAt: string | null
 }
+
+// ── Product 类型 ───────────────────────────────────────────────
+
+export interface Product {
+  id: string
+  ideaId: string          // 关联的需求 ID
+  ideaTitle: string       // 关联的需求标题
+  name: string            // 产品名称
+  tagline: string         // 一句话描述
+  problem: string         // 问题分析
+  solution: string        // 解决方案
+  targetUsers: string     // 目标用户
+  coreFeatures: string[]  // 核心功能列表
+  techStack: string[]     // 技术栈建议
+  monetization: string    // 商业模式
+  competitors: string     // 竞品分析
+  differentiator: string  // 差异化优势
+  mvp: string             // MVP 方案
+  createdAt: string       // 创建时间
+  status: 'draft' | 'confirmed'
+}
+
+export interface ProductSummary {
+  id: string
+  name: string
+  tagline: string
+  ideaTitle: string
+  createdAt: string
+}
