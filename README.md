@@ -4,12 +4,46 @@
 
 **在线体验：https://ideahub-lyart.vercel.app**
 
+---
+
+## 首页 - 需求发现
+
+自动抓取 16 个来源的需求，支持用户手动发布。点击需求可直接进入 AI 分析。
+
+![首页](public/screenshots/home.png)
+
+---
+
+## 社区展示 - 作品投票
+
+Product Hunt 风格的作品展示页，用户可投票支持喜欢的产品。点击直接进入产品预览。
+
+![社区](public/screenshots/community.png)
+
+---
+
+## 搜索 - 需求检索
+
+支持关键词搜索需求标题、描述和分类。
+
+![搜索](public/screenshots/search.png)
+
+---
+
+## Brainstorm - 多人协作
+
+发起 Brainstorm 会话，邀请同学一起讨论需求。支持添加需求、反馈、建议，结束后合并生成产品文档。
+
+![Brainstorm](public/screenshots/brainstorm.png)
+
+---
+
 ## 功能一览
 
 ### 需求发现
 - **16 个来源并行抓取**：V2EX、HackerNews、ProductHunt、Reddit、GitHub Trending/Issues、Dev.to、IndieHackers、36Kr、SSPAI、Twitter、小红书、App Store 评论、PH 评论、微博、知乎
 - **智能过滤**：自动过滤广告、代码 BUG、技术求助等非产品需求
-- **用户发布**：支持手动发布需求，所有用户共享（Vercel Blob 存储）
+- **用户发布**：支持手动发布需求，所有用户共享
 
 ### AI 产品生成
 - **一键分析**：点击需求 → AI 自动生成产品方案（问题分析、解决方案、目标用户、核心功能、技术栈、商业模式、竞品分析、MVP 方案）
@@ -34,17 +68,18 @@
 - **投票排序**：Product Hunt 风格的投票机制，每人每产品一票
 - **点击体验**：直接跳转到产品预览页
 
-### 搜索功能
-- **关键词搜索**：搜索需求标题、描述、分类
+---
 
 ## 技术栈
 
 - **前端**：Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS
 - **后端**：Next.js API Routes + Vercel Serverless
-- **存储**：JSONBlob（产品/需求数据）+ localStorage（用户偏好）
+- **存储**：JSONBlob（产品/需求数据）
 - **AI**：Agnes AI API（产品方案生成）
 - **爬虫**：原生 fetch + crawl4ai（可选，本地运行）
 - **部署**：Vercel
+
+---
 
 ## 快速开始
 
@@ -65,7 +100,7 @@ npm run dev
 | 变量 | 说明 | 必填 |
 |------|------|------|
 | `AGNES_API_KEY` | Agnes AI API 密钥（用于产品方案生成） | 是 |
-| `JSONBLOB_ID` | JSONBlob 存储 ID（用于持久化数据） | 否（有默认） |
+| `JSONBLOB_ID` | JSONBlob 存储 ID（用于持久化数据） | 否 |
 
 ## 部署
 
