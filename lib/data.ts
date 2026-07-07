@@ -12,6 +12,7 @@ export const platformMeta: Record<Platform, { label: string; color: string; bgCl
   hackernews:   { label: 'HN',     color: '#FF6600', bgClass: 'bg-orange-100 dark:bg-orange-900/30',  textClass: 'text-orange-600 dark:text-orange-400' },
   douyin:       { label: '抖音',   color: '#000000', bgClass: 'bg-gray-100 dark:bg-gray-800',         textClass: 'text-gray-700 dark:text-gray-300' },
   xiaohongshu:  { label: '小红书', color: '#FE2C55', bgClass: 'bg-pink-100 dark:bg-pink-900/30',      textClass: 'text-pink-600 dark:text-pink-400' },
+  other:        { label: '其他',   color: '#6B7280', bgClass: 'bg-gray-100 dark:bg-gray-800',         textClass: 'text-gray-600 dark:text-gray-400' },
 }
 
 // ── Categories ─────────────────────────────────────────────────

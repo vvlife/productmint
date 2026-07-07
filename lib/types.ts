@@ -9,6 +9,7 @@ export type Platform =
   | 'hackernews'
   | 'douyin'
   | 'xiaohongshu'
+  | 'other'
 
 export type Category =
   | 'AI工具'

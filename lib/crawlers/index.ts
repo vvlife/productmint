@@ -7,6 +7,11 @@ import { crawlProductHunt } from './producthunt'
 import { crawlReddit } from './reddit'
 import { crawlWeibo } from './weibo'
 import { crawlZhihu } from './zhihu'
+import { crawlGitHubTrending } from './github-trending'
+import { crawl36kr } from './36kr'
+import { crawlDevto } from './devto'
+import { crawlIndieHackers } from './indiehackers'
+import { crawlSSPAI } from './sspai'
 
 export interface CrawlResult {
   ideas: Idea[]
@@ -20,6 +25,11 @@ export async function crawlAll(): Promise<CrawlResult> {
     { name: 'HackerNews', fn: crawlHackerNews },
     { name: 'ProductHunt', fn: crawlProductHunt },
     { name: 'Reddit', fn: crawlReddit },
+    { name: 'GitHub', fn: crawlGitHubTrending },
+    { name: '36Kr', fn: crawl36kr },
+    { name: 'Dev.to', fn: crawlDevto },
+    { name: 'IndieHackers', fn: crawlIndieHackers },
+    { name: 'SSPAI', fn: crawlSSPAI },
     { name: 'Weibo', fn: crawlWeibo },
     { name: 'Zhihu', fn: crawlZhihu },
   ]
