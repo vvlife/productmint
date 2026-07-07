@@ -1,55 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { collectNews, isNewsbotAvailable } from '@/lib/newsbot-client'
-import type { Idea, Category } from '@/lib/types'
+import { NextResponse } from 'next/server'
+import { triggerCrawl } from '@/lib/store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
-    const { topic } = await req.json()
-
-    if (!topic?.trim()) {
-      return NextResponse.json({ error: 'topic is required' }, { status: 400 })
-    }
-
-    // Check if NewsBot server is available
-    const available = await isNewsbotAvailable()
-    if (!available) {
-      return NextResponse.json({
-        error: 'NewsBot server is not available. Start it with: python crawl-server/newsbot.py',
-      }, { status: 503 })
-    }
-
-    // Collect by topic
-    const result = await collectNews([topic.trim()], 20)
-
-    if (!result.success) {
-      return NextResponse.json({
-        error: 'Collection failed',
-        details: result,
-      }, { status: 500 })
-    }
-
-    // Convert to Idea format
-    const validCategories: Category[] = ['AI工具', 'SaaS', '消费', '教育', '开发者工具', '设计', '出海', '其他']
-    const ideas: Idea[] = result.ideas.map((item, idx) => ({
-      id: item.id || `newsbot_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`,
-      title: item.title,
-      description: item.description,
-      platform: 'other' as const,
-      sourceUrl: item.sourceUrl || '',
-      publishedAt: item.publishedAt || new Date().toISOString(),
-      heat: item.heat || 0,
-      category: (validCategories.includes(item.category as Category) ? item.category : '其他') as Category,
-    }))
-
+    const result = await triggerCrawl()
     return NextResponse.json({
       success: true,
-      topic,
-      ideas,
-      total: ideas.length,
-      collected_at: result.collected_at,
+      ideas: result.ideas,
+      collections: result.collections,
+      ...result.response,
     })
   } catch (error: any) {
     return NextResponse.json(
@@ -60,11 +22,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const available = await isNewsbotAvailable()
   return NextResponse.json({
-    available,
-    message: available
-      ? 'NewsBot server is running'
-      : 'NewsBot server is not available. Start it with: python crawl-server/newsbot.py',
+    available: true,
+    message: 'RSS feed crawler is built-in, no external server needed',
   })
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect, useMemo, useCallback } from 'react'
+import { Suspense, useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import IdeaCard from '@/components/IdeaCard'
 import CollectionCard from '@/components/CollectionCard'
@@ -15,9 +15,6 @@ function SearchContent() {
   const [ideas, setIdeas] = useState<Idea[]>([])
   const [collections, setCollections] = useState<Collection[]>([])
   const [loading, setLoading] = useState(true)
-  const [newsbotLoading, setNewsbotLoading] = useState(false)
-  const [newsbotResults, setNewsbotResults] = useState<Idea[]>([])
-  const [searchMode, setSearchMode] = useState<'local' | 'newsbot'>('local')
 
   useEffect(() => {
     try {
@@ -31,29 +28,7 @@ function SearchContent() {
     setLoading(false)
   }, [])
 
-  // NewsBot web search
-  const searchNewsbot = useCallback(async (q: string) => {
-    if (!q.trim()) return
-    setNewsbotLoading(true)
-    try {
-      const resp = await fetch(`/api/search?q=${encodeURIComponent(q)}&source=newsbot`, {
-        cache: 'no-store',
-      })
-      if (resp.ok) {
-        const data = await resp.json()
-        setNewsbotResults(data.results || [])
-      }
-    } catch {}
-    setNewsbotLoading(false)
-  }, [])
-
-  useEffect(() => {
-    if (searchMode === 'newsbot' && query) {
-      searchNewsbot(query)
-    }
-  }, [searchMode, query, searchNewsbot])
-
-  const localResults = useMemo(() => {
+  const results = useMemo(() => {
     if (!query.trim()) return { ideas: [], collections: [] }
     const q = query.toLowerCase().trim()
     return {
@@ -70,12 +45,7 @@ function SearchContent() {
     }
   }, [query, ideas, collections])
 
-  const total = searchMode === 'newsbot'
-    ? newsbotResults.length
-    : localResults.ideas.length + localResults.collections.length
-
-  const displayIdeas = searchMode === 'newsbot' ? newsbotResults : localResults.ideas
-  const displayCollections = searchMode === 'newsbot' ? [] : localResults.collections
+  const total = results.ideas.length + results.collections.length
 
   if (loading) {
     return (
@@ -111,36 +81,9 @@ function SearchContent() {
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           搜索「{query}」
         </h1>
-        <div className="mt-3 flex gap-2">
-          <button
-            onClick={() => setSearchMode('local')}
-            className={`px-3 py-1 text-xs rounded-full transition ${
-              searchMode === 'local'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-            }`}
-          >
-            本地数据
-          </button>
-          <button
-            onClick={() => setSearchMode('newsbot')}
-            className={`px-3 py-1 text-xs rounded-full transition ${
-              searchMode === 'newsbot'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-            }`}
-          >
-            网络搜索
-          </button>
-        </div>
       </div>
 
-      {newsbotLoading && searchMode === 'newsbot' ? (
-        <div className="py-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300 dark:border-gray-600"></div>
-          <p className="mt-3 text-sm text-gray-400">正在搜索...</p>
-        </div>
-      ) : total === 0 ? (
+      {total === 0 ? (
         <div className="py-20 text-center">
           <p className="text-4xl mb-4">🔍</p>
           <p className="text-gray-400 dark:text-gray-500">没有找到相关需求</p>
@@ -155,10 +98,10 @@ function SearchContent() {
             找到 <span className="font-semibold text-gray-900 dark:text-gray-100">{total}</span> 条结果
           </p>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {displayCollections.map(c => (
+            {results.collections.map(c => (
               <CollectionCard key={`col-${c.id}`} collection={c} />
             ))}
-            {displayIdeas.map(i => (
+            {results.ideas.map(i => (
               <IdeaCard key={`idea-${i.id}`} idea={i} />
             ))}
           </div>

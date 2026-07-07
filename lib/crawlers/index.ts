@@ -1,55 +1,29 @@
 import type { RawIdea, Idea, CrawlStats } from '../types'
 import { categorize } from '../categorize'
 import { filterAds } from '../filter'
-import { isNewsbotAvailable, collectNews } from '../newsbot-client'
+import { crawlAllFeeds } from '../rss-fetcher'
 
 export interface CrawlResult {
   ideas: Idea[]
   stats: CrawlStats
 }
 
-// ── NewsBot collection ────────────────────────────────────────
-async function crawlNewsbot(): Promise<RawIdea[]> {
-  if (!(await isNewsbotAvailable())) {
-    return []
-  }
-
-  const response = await collectNews([], 30)
-
-  if (!response.success || !response.ideas) return []
-
-  return response.ideas.map(item => ({
-    title: item.title,
-    description: item.description,
-    platform: 'other' as const,
-    sourceUrl: item.sourceUrl || '',
-    publishedAt: item.publishedAt || new Date().toISOString(),
-    heat: item.heat || 0,
-  }))
-}
-
-// ── Main crawl function ───────────────────────────────────────
 export async function crawlAll(): Promise<CrawlResult> {
   const errors: string[] = []
   const byPlatform: Record<string, number> = {}
+
   let allRawIdeas: RawIdea[] = []
 
-  // Try NewsBot collection
   try {
-    const newsbotIdeas = await crawlNewsbot()
-    if (newsbotIdeas.length > 0) {
-      byPlatform['NewsBot'] = newsbotIdeas.length
-      allRawIdeas.push(...newsbotIdeas)
-    }
+    allRawIdeas = await crawlAllFeeds()
+    byPlatform['RSS'] = allRawIdeas.length
   } catch (e: any) {
-    errors.push(`NewsBot: ${e?.message || 'unknown error'}`)
+    errors.push(`RSS feeds: ${e?.message || 'unknown error'}`)
   }
 
-  // Filter ads
   const filteredIdeas = filterAds(allRawIdeas)
   const filteredCount = allRawIdeas.length - filteredIdeas.length
 
-  // Convert RawIdea → Idea with categorization and unique IDs
   const ideas: Idea[] = filteredIdeas.map((raw, index) => {
     const category = categorize(raw.title, raw.description)
     return {

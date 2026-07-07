@@ -1,7 +1,6 @@
 import type { Idea, Collection, CrawlResponse, CrawlStats, FeedResponse } from './types'
 import { crawlAll } from './crawlers'
 import { clusterIdeas } from './cluster'
-import { isNewsbotAvailable, searchNews } from './newsbot-client'
 
 // ── In-memory cache (per serverless instance) ─────────────────
 let _ideas: Idea[] = []
@@ -81,7 +80,6 @@ export async function search(query: string) {
   const q = query.toLowerCase().trim()
   if (!q) return { results: [], total: 0 }
 
-  // 1. Local search (in-memory)
   const matchedIdeas = _ideas.filter(i =>
     i.title.toLowerCase().includes(q) ||
     i.description.toLowerCase().includes(q)
@@ -91,7 +89,7 @@ export async function search(query: string) {
     c.summary.toLowerCase().includes(q)
   )
 
-  const localResults = [
+  const results = [
     ...matchedIdeas.map(i => ({ type: 'idea' as const, ...i })),
     ...matchedCollections.map(c => ({
       type: 'collection' as const,
@@ -100,33 +98,7 @@ export async function search(query: string) {
     })),
   ].sort((a: any, b: any) => (b.heat ?? 0) - (a.heat ?? 0))
 
-  // 2. NewsBot search (web search) if local results are sparse
-  if (localResults.length < 3 && (await isNewsbotAvailable())) {
-    try {
-      const newsbotResult = await searchNews(query, 10)
-      if (newsbotResult.success && newsbotResult.ideas) {
-        const newsbotIdeas = newsbotResult.ideas.map((item, idx) => ({
-          type: 'idea' as const,
-          id: `newsbot_search_${Date.now()}_${idx}`,
-          title: item.title,
-          description: item.description,
-          platform: 'other' as const,
-          sourceUrl: item.sourceUrl || '',
-          publishedAt: item.publishedAt || new Date().toISOString(),
-          heat: item.heat || 0,
-          category: (item.category || '其他') as any,
-        }))
-        // Merge: local first, then NewsBot results (dedup by title)
-        const seenTitles = new Set(localResults.map((r: any) => r.title?.toLowerCase()))
-        const uniqueNewsbot = newsbotIdeas.filter(a => !seenTitles.has(a.title?.toLowerCase()))
-        localResults.push(...uniqueNewsbot)
-      }
-    } catch (e) {
-      console.error('NewsBot search failed:', e)
-    }
-  }
-
-  return { results: localResults, total: localResults.length }
+  return { results, total: results.length }
 }
 
 export function getLastCrawlTime() { return _lastCrawlAt }
