@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import type { Collection } from '@/lib/types'
 
 function formatTime(iso: string): string {
   const date = new Date(iso)
@@ -15,7 +14,8 @@ function formatTime(iso: string): string {
   return '刚刚'
 }
 
-export default function CollectionCard({ collection }: { collection: Collection }) {
+export default function CollectionCard({ collection }: { collection: any }) {
+  const count = collection.ideaCount ?? collection.ideaIds?.length ?? 0
   return (
     <Link
       href={`/collection/${collection.id}`}
@@ -25,7 +25,7 @@ export default function CollectionCard({ collection }: { collection: Collection 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-              集合 · {collection.ideaCount || collection.ideaIds?.length || 0}条
+              集合 · {count}条
             </span>
             <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
               {collection.title}
