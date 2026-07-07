@@ -210,37 +210,68 @@ export async function POST() {
         votedBy: [],
       }
 
+      // 4. 生成产品页面 HTML
+      console.log(`[daily] Generating product page HTML...`)
+      try {
+        const genResp = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://ideahub-pearl.vercel.app'}/api/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: productData.name,
+            tagline: productData.tagline,
+            problem: productData.problem,
+            solution: productData.solution,
+            targetUsers: productData.targetUsers,
+            coreFeatures: productData.coreFeatures,
+            techStack: [],
+          }),
+        })
+        if (genResp.ok) {
+          const genData = await genResp.json()
+          if (genData.html) {
+            product.generatedHtml = genData.html
+          }
+        }
+      } catch (e) {
+        console.error(`[daily] HTML generation failed:`, e)
+      }
+
       await saveProduct(product)
       newProductsCount++
 
-      // 4. 发送产品邮件
-      const productUrl = `https://ideahub-pearl.vercel.app/product/${productId}`
+      // 5. 发送产品邮件（直接链接到产品界面）
+      const productAppUrl = `https://ideahub-pearl.vercel.app/product/${productId}/app`
       const featuresList = (productData.coreFeatures || []).map((f: string) => `<li style="color:#666;margin-bottom:4px;">• ${f}</li>`).join('')
 
       await sendEmail(
         sub.email,
-        `新产品方案：${productData.name}`,
+        `新产品已生成：${productData.name}`,
         `
           <div style="font-family:-apple-system,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-            <h2 style="color:#111;margin-bottom:8px;">${productData.name}</h2>
-            <p style="color:#666;font-size:14px;margin-bottom:16px;">${productData.tagline}</p>
+            <div style="background:#f9fafb;border-radius:12px;padding:20px;margin-bottom:20px;">
+              <h2 style="color:#111;margin-bottom:4px;font-size:20px;">${productData.name}</h2>
+              <p style="color:#666;font-size:14px;margin-bottom:16px;">${productData.tagline}</p>
 
-            <div style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px;">
-              <h3 style="color:#111;font-size:14px;margin-bottom:8px;">问题</h3>
-              <p style="color:#666;font-size:13px;margin-bottom:12px;">${productData.problem}</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                <div style="flex:1;min-width:200px;">
+                  <p style="color:#999;font-size:11px;text-transform:uppercase;margin-bottom:4px;">问题</p>
+                  <p style="color:#333;font-size:13px;">${productData.problem}</p>
+                </div>
+                <div style="flex:1;min-width:200px;">
+                  <p style="color:#999;font-size:11px;text-transform:uppercase;margin-bottom:4px;">解决方案</p>
+                  <p style="color:#333;font-size:13px;">${productData.solution}</p>
+                </div>
+              </div>
 
-              <h3 style="color:#111;font-size:14px;margin-bottom:8px;">解决方案</h3>
-              <p style="color:#666;font-size:13px;margin-bottom:12px;">${productData.solution}</p>
-
-              <h3 style="color:#111;font-size:14px;margin-bottom:8px;">核心功能</h3>
-              <ul style="padding-left:20px;margin:0;">${featuresList}</ul>
+              <p style="color:#999;font-size:11px;text-transform:uppercase;margin-bottom:4px;">核心功能</p>
+              <ul style="padding-left:16px;margin:0;">${featuresList}</ul>
             </div>
 
-            <a href="${productUrl}" style="display:inline-block;padding:12px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">
-              查看产品页面
+            <a href="${productAppUrl}" style="display:block;text-align:center;padding:14px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
+              查看产品设计 →
             </a>
 
-            <p style="color:#999;font-size:12px;margin-top:16px;">由 IdeaHub 自动生成</p>
+            <p style="color:#bbb;font-size:11px;text-align:center;margin-top:12px;">由 IdeaHub 自动生成</p>
           </div>
         `
       )
