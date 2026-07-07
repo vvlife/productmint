@@ -75,8 +75,8 @@ export default function Header() {
       <div className="mx-auto max-w-content px-4">
         <div className="flex items-center justify-between h-14 gap-4">
           <Link href="/" className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Product</span>
-            <span className="text-xl font-bold text-blue-500">Mint</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">V</span>
+            <span className="text-xl font-bold text-blue-500">Studio</span>
           </Link>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md">

@@ -3,7 +3,7 @@ import './globals.css'
 import Header from '@/components/Header'
 
 export const metadata: Metadata = {
-  title: 'ProductMint - From Idea to Product',
+  title: 'V-Studio - From Idea to Product',
   description: 'Turn startup ideas into real products.',
 }
 
@@ -41,7 +41,7 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="mx-auto max-w-content px-4 py-8 text-center text-xs text-gray-400 dark:text-gray-600">
-          <p>ProductMint · From Idea to Product</p>
+          <p>V-Studio · From Idea to Product</p>
         </footer>
       </body>
     </html>
