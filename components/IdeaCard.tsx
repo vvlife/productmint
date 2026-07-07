@@ -92,7 +92,6 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
                 </svg>
                 {idea.heat}
               </span>
-              <span className="hidden sm:inline">{idea.category}</span>
             </div>
           </div>
 

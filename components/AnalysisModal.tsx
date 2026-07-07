@@ -94,12 +94,27 @@ export default function AnalysisModal({
     setStep('analyzing')
     setError(null)
     try {
+      // 先搜索相关内容作为参考
+      let relatedContext = ''
+      try {
+        const searchResp = await fetch(`/api/search?q=${encodeURIComponent(idea.title)}`, { cache: 'no-store' })
+        if (searchResp.ok) {
+          const searchData = await searchResp.json()
+          const related = (searchData.results || []).slice(0, 5)
+          if (related.length > 0) {
+            relatedContext = '\n\n## 相关动态参考\n' + related.map((r: any, i: number) =>
+              `${i + 1}. ${r.title}: ${r.description?.slice(0, 100) || ''}`
+            ).join('\n')
+          }
+        }
+      } catch {}
+
       const resp = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ideaTitle: idea.title,
-          ideaDescription: idea.description,
+          ideaDescription: idea.description + relatedContext,
           platform: idea.platform,
           category: idea.category,
         }),

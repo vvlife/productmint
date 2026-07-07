@@ -1,67 +1,49 @@
 'use client'
 
-import { Suspense, useState, useEffect, useMemo } from 'react'
+import { Suspense, useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import IdeaCard from '@/components/IdeaCard'
-import CollectionCard from '@/components/CollectionCard'
 import Link from 'next/link'
-import type { Idea, Collection } from '@/lib/types'
-
-const CACHE_KEY = 'ideahub_cache'
+import type { Idea } from '@/lib/types'
 
 function SearchContent() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
-  const [ideas, setIdeas] = useState<Idea[]>([])
-  const [collections, setCollections] = useState<Collection[]>([])
-  const [loading, setLoading] = useState(true)
+  const [results, setResults] = useState<Idea[]>([])
+  const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
 
-  useEffect(() => {
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setResults([])
+      setSearched(false)
+      return
+    }
+    setLoading(true)
+    setSearched(true)
     try {
-      const cached = localStorage.getItem(CACHE_KEY)
-      if (cached) {
-        const data = JSON.parse(cached)
-        setIdeas(data.ideas || [])
-        setCollections(data.collections || [])
+      const resp = await fetch(`/api/search?q=${encodeURIComponent(q)}`, { cache: 'no-store' })
+      if (resp.ok) {
+        const data = await resp.json()
+        setResults(data.results || [])
       }
     } catch {}
     setLoading(false)
   }, [])
 
-  const results = useMemo(() => {
-    if (!query.trim()) return { ideas: [], collections: [] }
-    const q = query.toLowerCase().trim()
-    return {
-      ideas: ideas.filter(i =>
-        i.title.toLowerCase().includes(q) ||
-        i.description.toLowerCase().includes(q) ||
-        i.category.toLowerCase().includes(q)
-      ),
-      collections: collections.filter(c =>
-        c.title.toLowerCase().includes(q) ||
-        c.summary.toLowerCase().includes(q) ||
-        c.category.toLowerCase().includes(q)
-      ),
+  useEffect(() => {
+    if (query) {
+      doSearch(query)
     }
-  }, [query, ideas, collections])
-
-  const total = results.ideas.length + results.collections.length
-
-  if (loading) {
-    return (
-      <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
-      </div>
-    )
-  }
+  }, [query, doSearch])
 
   if (!query) {
     return (
       <div className="py-20 text-center">
         <p className="text-4xl mb-4">💡</p>
-        <p className="text-gray-400 dark:text-gray-500">输入关键词搜索创业需求</p>
+        <p className="text-gray-400 dark:text-gray-500">输入关键词搜索</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {['AI写作', '代码审查', 'SaaS', '出海', '无代码', 'AI客服'].map(tag => (
+          {['AI写作', '代码助手', 'SaaS工具', '出海产品', '无代码平台'].map(tag => (
             <Link
               key={tag}
               href={`/search?q=${encodeURIComponent(tag)}`}
@@ -83,25 +65,27 @@ function SearchContent() {
         </h1>
       </div>
 
-      {total === 0 ? (
+      {loading ? (
+        <div className="py-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300 dark:border-gray-600"></div>
+          <p className="mt-3 text-sm text-gray-400">正在搜索...</p>
+        </div>
+      ) : results.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-4xl mb-4">🔍</p>
-          <p className="text-gray-400 dark:text-gray-500">没有找到相关需求</p>
+          <p className="text-gray-400 dark:text-gray-500">没有找到相关内容</p>
           <p className="text-xs text-gray-400 dark:text-gray-600 mt-2">
             试试其他关键词，或
-            <Link href="/" className="text-blue-500 hover:underline ml-1">返回首页浏览</Link>
+            <Link href="/" className="text-blue-500 hover:underline ml-1">返回首页</Link>
           </p>
         </div>
       ) : (
         <>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            找到 <span className="font-semibold text-gray-900 dark:text-gray-100">{total}</span> 条结果
+            找到 <span className="font-semibold text-gray-900 dark:text-gray-100">{results.length}</span> 条结果
           </p>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {results.collections.map(c => (
-              <CollectionCard key={`col-${c.id}`} collection={c} />
-            ))}
-            {results.ideas.map(i => (
+            {results.map(i => (
               <IdeaCard key={`idea-${i.id}`} idea={i} />
             ))}
           </div>
