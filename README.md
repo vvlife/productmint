@@ -6,6 +6,18 @@
 
 ---
 
+## 落地页
+
+Web3 风格的产品宣传页，展示核心功能和技术栈。
+
+![落地页](public/screenshots/landing.png)
+
+![落地页功能](public/screenshots/landing2.png)
+
+![移动端落地页](public/screenshots/landing-mobile.png)
+
+---
+
 ## 首页 - 需求时间线
 
 自动抓取中文科技媒体的最新动态，按时间线展示。点击标题跳转原文，点击「生成点子」直接开始分析。
