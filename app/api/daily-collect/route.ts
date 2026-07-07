@@ -289,7 +289,7 @@ export async function POST() {
               <ul style="padding-left:16px;margin:0;">${featuresList}</ul>
             </div>
 
-            <a href="${productUrl}" style="display:block;text-align:center;padding:14px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
+            <a href="${productAppUrl}" style="display:block;text-align:center;padding:14px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
               查看产品设计 →
             </a>
 

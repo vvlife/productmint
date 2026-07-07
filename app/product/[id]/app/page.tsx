@@ -41,12 +41,18 @@ export default function ProductAppPage() {
     loadProduct()
   }, [loadProduct])
 
+  // 当前展示的版本 HTML（默认最新版本）
+  const versions = (product?.versions || []).slice().sort((a, b) => b.version - a.version)
+  const currentVersion = product?.currentVersion || (versions.length ? versions[0].version : 1)
+  const activeHtml = product
+    ? (versions.find(v => v.version === currentVersion)?.html || product.generatedHtml || '')
+    : ''
+
   // 自动生成功能：如果没有 HTML，自动生成
   useEffect(() => {
     if (!product || activeHtml || genState === 'generating') return
     if (product.generatedHtml || (product.versions && product.versions.length > 0)) return
 
-    // 自动触发生成
     const autoGenerate = async () => {
       setGenState('generating')
       setGenProgress(30)
@@ -71,13 +77,6 @@ export default function ProductAppPage() {
     }
     autoGenerate()
   }, [product, activeHtml, genState, loadProduct])
-
-  // 当前展示的版本 HTML（默认最新版本）
-  const versions = (product?.versions || []).slice().sort((a, b) => b.version - a.version)
-  const currentVersion = product?.currentVersion || (versions.length ? versions[0].version : 1)
-  const activeHtml = product
-    ? (versions.find(v => v.version === currentVersion)?.html || product.generatedHtml || '')
-    : ''
 
   // 切换版本
   const switchVersion = async (version: number) => {
