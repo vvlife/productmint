@@ -83,6 +83,9 @@ export default function Header() {
     error: '抓取失败',
   }[refreshState]
 
+  const isLanding = pathname === '/home'
+  if (isLanding) return null
+
   return (
     <>
       {/* 移动端搜索弹窗 */}
