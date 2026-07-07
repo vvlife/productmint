@@ -210,37 +210,11 @@ export async function POST() {
         votedBy: [],
       }
 
-      // 4. 生成产品页面 HTML
-      console.log(`[daily] Generating product page HTML...`)
-      try {
-        const genResp = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://ideahub-pearl.vercel.app'}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: productData.name,
-            tagline: productData.tagline,
-            problem: productData.problem,
-            solution: productData.solution,
-            targetUsers: productData.targetUsers,
-            coreFeatures: productData.coreFeatures,
-            techStack: [],
-          }),
-        })
-        if (genResp.ok) {
-          const genData = await genResp.json()
-          if (genData.html) {
-            product.generatedHtml = genData.html
-          }
-        }
-      } catch (e) {
-        console.error(`[daily] HTML generation failed:`, e)
-      }
-
       await saveProduct(product)
       newProductsCount++
 
-      // 5. 发送产品邮件（直接链接到产品界面）
-      const productAppUrl = `https://ideahub-pearl.vercel.app/product/${productId}/app`
+      // 4. 发送产品邮件（链接到产品页面）
+      const productUrl = `https://ideahub-pearl.vercel.app/product/${productId}`
       const featuresList = (productData.coreFeatures || []).map((f: string) => `<li style="color:#666;margin-bottom:4px;">• ${f}</li>`).join('')
 
       await sendEmail(
@@ -267,7 +241,7 @@ export async function POST() {
               <ul style="padding-left:16px;margin:0;">${featuresList}</ul>
             </div>
 
-            <a href="${productAppUrl}" style="display:block;text-align:center;padding:14px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
+            <a href="${productUrl}" style="display:block;text-align:center;padding:14px 24px;background:#111;color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
               查看产品设计 →
             </a>
 
