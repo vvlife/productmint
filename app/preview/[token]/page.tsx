@@ -37,37 +37,75 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
     setStage('正在分析需求...')
 
     try {
-      // 调用生成 API
+      // 1. 先生成产品方案
       const resp = await fetch('/api/generate-idea', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, ideaId: ideaData.ideaId, ideaTitle }),
       })
 
-      setProgress(50)
+      setProgress(40)
       setStage('正在生成产品方案...')
 
       const data = await resp.json()
 
-      if (data.success) {
-        setProgress(100)
-        setStage('生成完成')
-        setProductId(data.product.id)
-        setDone(true)
-
-        // 发送站内信通知
-        window.dispatchEvent(new CustomEvent('ideahub:notification', {
-          detail: {
-            type: 'done',
-            title: '产品已生成',
-            body: `「${data.product.name}」的产品方案已生成完成`,
-            href: `/product/${data.product.id}`,
-          }
-        }))
-      } else {
+      if (!data.success) {
         setError(data.error || '生成失败')
         setGenerating(false)
+        return
       }
+
+      const productId = data.product.id
+      setProductId(productId)
+
+      // 2. 再生成产品页面
+      setProgress(60)
+      setStage('正在生成产品页面...')
+
+      try {
+        const genResp = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.product.name,
+            tagline: data.product.tagline,
+            problem: data.product.problem,
+            solution: data.product.solution,
+            targetUsers: data.product.targetUsers,
+            coreFeatures: data.product.coreFeatures,
+            techStack: data.product.techStack,
+          }),
+        })
+
+        setProgress(80)
+        setStage('正在保存产品页面...')
+
+        if (genResp.ok) {
+          const genData = await genResp.json()
+          if (genData.html) {
+            // 保存 HTML
+            await fetch(`/api/products/${productId}/versions`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt: '' }),
+            })
+          }
+        }
+      } catch {}
+
+      setProgress(100)
+      setStage('生成完成')
+      setDone(true)
+
+      // 发送站内信通知
+      window.dispatchEvent(new CustomEvent('ideahub:notification', {
+        detail: {
+          type: 'done',
+          title: '产品已生成',
+          body: `「${data.product.name}」的产品方案和产品页面已生成完成`,
+          href: `/product/${productId}/app`,
+        }
+      }))
     } catch (e) {
       setError('网络错误，请重试')
       setGenerating(false)
@@ -84,12 +122,18 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">产品已生成</h1>
         <p className="text-gray-500 mb-6">
-          「{ideaTitle}」的产品方案已生成完成
+          「{ideaTitle}」的产品方案和产品页面已生成完成
         </p>
         <div className="flex gap-3 justify-center">
           <a
-            href={`/product/${productId}`}
+            href={`/product/${productId}/app`}
             className="px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition"
+          >
+            查看产品页面
+          </a>
+          <a
+            href={`/product/${productId}`}
+            className="px-6 py-2.5 text-sm text-gray-500 hover:text-gray-900 transition"
           >
             查看产品方案
           </a>
