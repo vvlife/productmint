@@ -83,10 +83,9 @@ export default function CommunityPage() {
 
       {products.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="text-4xl mb-4">🚀</p>
           <p className="text-gray-500 dark:text-gray-400 mb-2">还没有作品</p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            <Link href="/" className="text-blue-500 hover:underline">去首页</Link> 生成第一个产品
+            <Link href="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition">去首页</Link> 生成第一个产品
           </p>
         </div>
       ) : (

@@ -63,47 +63,42 @@ export default function Header() {
     error: '抓取失败',
   }[refreshState]
 
-  const buttonClass = {
-    idle: 'text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800',
-    loading: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-wait',
-    success: 'text-green-500 bg-green-50 dark:bg-green-900/20',
-    error: 'text-red-500 bg-red-50 dark:bg-red-900/20',
-  }[refreshState]
-
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
-      <div className="mx-auto max-w-content px-4">
-        <div className="flex items-center justify-between h-14 gap-4">
-          <Link href="/" className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Idea</span>
-            <span className="text-xl font-bold text-blue-500">Hub</span>
+    <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div className="mx-auto max-w-3xl px-4">
+        <div className="flex items-center justify-between h-14 gap-3">
+          <Link href="/" className="flex items-center gap-1.5 shrink-0 font-semibold text-gray-900 dark:text-white">
+            Idea<span className="text-blue-600">Hub</span>
           </Link>
 
-          <Link href="/community" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition shrink-0">
-            🏆 社区
+          <Link href="/community" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0">
+            社区
           </Link>
 
-          <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+          <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md flex items-center gap-2">
+            <div className="relative flex-1">
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索需求..."
-                className="w-full pl-9 pr-4 py-1.5 text-sm rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="搜索..."
+                className="w-full px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 transition"
               />
             </div>
+            <button
+              type="submit"
+              disabled={!query.trim()}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              搜索
+            </button>
           </form>
 
-          {/* 发布需求按钮 - 触发首页的发布弹窗 */}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('ideahub:show-submit'))}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full hover:opacity-90 transition shadow-sm shrink-0"
+            className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0"
           >
-            ✏️ 发布
+            发布
           </button>
 
           <Notifications />
@@ -111,18 +106,25 @@ export default function Header() {
           <button
             onClick={handleRefresh}
             disabled={refreshState === 'loading'}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition ${buttonClass}`}
-            title={buttonLabel}
+            className={`px-3 py-1.5 text-sm rounded-lg transition shrink-0 ${
+              refreshState === 'loading'
+                ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 cursor-wait'
+                : refreshState === 'success'
+                ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                : refreshState === 'error'
+                ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
           >
+            <span className="hidden sm:inline">{buttonLabel}</span>
             <svg
-              className={`w-3.5 h-3.5 ${refreshState === 'loading' ? 'animate-spin' : ''}`}
+              className={`w-4 h-4 sm:hidden ${refreshState === 'loading' ? 'animate-spin' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span className="hidden sm:inline">{buttonLabel}</span>
           </button>
         </div>
       </div>

@@ -47,7 +47,7 @@ export default function Timeline({ ideas, collections }: Props) {
     <div>
       {grouped.map(([dateLabel, items]) => (
         <div key={dateLabel}>
-          <div className="sticky top-14 z-40 py-2 bg-white dark:bg-gray-950">
+          <div className="sticky top-14 z-40 py-2 bg-gray-50 dark:bg-gray-950">
             <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
               {dateLabel}
             </p>

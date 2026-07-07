@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Idea, Collection, FeedResponse } from '@/lib/types'
 import Timeline from '@/components/Timeline'
+import Hero from '@/components/Hero'
 import { addNotification } from '@/lib/notify'
 
 const CACHE_KEY = 'ideahub_cache'
@@ -20,7 +21,6 @@ export default function HomePage() {
   const [description, setDescription] = useState('')
   const [author, setAuthor] = useState('')
 
-  // 初始化用户 ID 和昵称
   useEffect(() => {
     if (typeof window === 'undefined') return
     let userId = localStorage.getItem(USER_KEY)
@@ -32,7 +32,6 @@ export default function HomePage() {
     if (savedName) setAuthor(savedName)
   }, [])
 
-  // 加载用户提交的需求（从 API）
   const loadUserIdeas = useCallback(async (): Promise<Idea[]> => {
     try {
       const resp = await fetch('/api/ideas', { cache: 'no-store' })
@@ -87,7 +86,6 @@ export default function HomePage() {
       const hasCache = await loadFromCache()
       if (!hasCache) {
         const hasData = await fetchFromAPI()
-        // 如果还没数据，自动触发一次抓取
         if (!hasData) {
           try {
             const resp = await fetch('/api/crawl', { method: 'POST', cache: 'no-store' })
@@ -97,7 +95,6 @@ export default function HomePage() {
                 setIdeas(data.ideas)
                 setCollections(data.collections || [])
                 setLastCrawlAt(data.crawledAt)
-                // 写入缓存
                 localStorage.setItem(CACHE_KEY, JSON.stringify({ ideas: data.ideas, collections: data.collections }))
                 localStorage.setItem(CACHE_TIME_KEY, data.crawledAt)
               }
@@ -121,7 +118,6 @@ export default function HomePage() {
     return () => window.removeEventListener('ideahub:crawl-complete', handleCrawlComplete as EventListener)
   }, [])
 
-  // 监听 Header 发布需求按钮
   useEffect(() => {
     const handleShowSubmit = () => setShowSubmit(true)
     window.addEventListener('ideahub:show-submit', handleShowSubmit)
@@ -139,13 +135,12 @@ export default function HomePage() {
       })
       if (resp.ok) {
         const { idea } = await resp.json()
-        // 更新显示
         setIdeas(prev => [idea, ...prev])
         localStorage.setItem('ideahub_author', author)
         setShowSubmit(false)
         setTitle('')
         setDescription('')
-        addNotification({ title: '需求发布成功', body: `「${idea.title}」已发布`, type: 'done' })
+        addNotification({ title: '发布成功', body: `「${idea.title}」已发布`, type: 'done' })
       }
     } catch {}
     setSubmitting(false)
@@ -154,46 +149,44 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
-        <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">加载中...</p>
+        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300 dark:border-gray-600"></div>
       </div>
     )
   }
 
   return (
     <>
-      {/* 发布需求弹窗 */}
       {showSubmit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowSubmit(false)}>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">发布需求</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">发布需求</h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">昵称 *</label>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">昵称</label>
                 <input
                   value={author}
                   onChange={e => setAuthor(e.target.value)}
                   placeholder="你的昵称"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">需求标题 *</label>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">需求标题</label>
                 <input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="例如：需要一个 AI 写周报的工具"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">详细描述（可选）</label>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">详细描述</label>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   placeholder="描述你的需求场景、痛点..."
                   rows={3}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 resize-none"
                 />
               </div>
             </div>
@@ -207,7 +200,7 @@ export default function HomePage() {
               <button
                 onClick={handleSubmitIdea}
                 disabled={!title.trim() || !author.trim() || submitting}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-50"
               >
                 {submitting ? '发布中...' : '发布'}
               </button>
@@ -217,13 +210,7 @@ export default function HomePage() {
       )}
 
       {ideas.length === 0 && collections.length === 0 ? (
-        <div className="py-20 text-center">
-          <p className="text-4xl mb-4">💡</p>
-          <p className="text-gray-500 dark:text-gray-400 mb-2">暂无数据</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
-            点击右上角「刷新」抓取，或点击「发布需求」提交
-          </p>
-        </div>
+        <Hero />
       ) : (
         <Timeline ideas={ideas} collections={collections} />
       )}

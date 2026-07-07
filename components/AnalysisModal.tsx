@@ -279,13 +279,13 @@ export default function AnalysisModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
-              AI 需求分析
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+              需求分析
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
               {idea.title}
@@ -366,19 +366,18 @@ export default function AnalysisModal({
           {step === 'generating' && genInfo.state === 'generating' && (
             <div className="text-center py-12">
               <div className="relative inline-flex items-center justify-center mb-5">
-                <div className="w-14 h-14 rounded-full border-4 border-purple-100 dark:border-purple-900/40" />
-                <div className="absolute w-14 h-14 rounded-full border-4 border-transparent border-t-purple-500 animate-spin" />
-                <span className="absolute text-xl">🛠️</span>
+                <div className="w-12 h-12 rounded-full border-4 border-gray-100 dark:border-gray-800" />
+                <div className="absolute w-12 h-12 rounded-full border-4 border-transparent border-t-gray-900 dark:border-t-white animate-spin" />
               </div>
               <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                正在生成产品页面…
+                正在生成产品页面
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-5" id="gen-status">
                 {genInfo.stage}
               </p>
-              <div className="max-w-sm mx-auto h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div className="max-w-sm mx-auto h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-700"
+                  className="h-full rounded-full bg-gray-900 dark:bg-white transition-all duration-700"
                   style={{ width: `${Math.max(8, Math.min(100, genInfo.progress))}%` }}
                 />
               </div>
@@ -391,7 +390,6 @@ export default function AnalysisModal({
           {/* 生成失败 */}
           {step === 'generating' && genInfo.state === 'error' && (
             <div className="text-center py-12">
-              <div className="text-5xl mb-4">⚠️</div>
               <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 产品页面生成失败
               </p>
@@ -419,9 +417,8 @@ export default function AnalysisModal({
           {/* 生成完成 */}
           {step === 'generating' && genInfo.state === 'done' && (
             <div className="text-center py-12">
-              <div className="text-5xl mb-4">🎉</div>
               <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                产品页面已生成！
+                产品页面已生成
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 可运行的产品页面已经准备好，点击即可试用。
@@ -437,9 +434,9 @@ export default function AnalysisModal({
                 <Link
                   href={`/product/${savedProduct?.id}/app`}
                   onClick={onClose}
-                  className="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full hover:opacity-90 transition shadow-sm"
+                  className="px-6 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
                 >
-                  👀 查看产品页面 →
+                  查看产品页面
                 </Link>
               </div>
             </div>
@@ -448,18 +445,17 @@ export default function AnalysisModal({
           {/* 初始状态 */}
           {step === 'idle' && (
             <div className="text-center py-8">
-              <div className="text-5xl mb-4">🤖</div>
               <p className="text-gray-600 dark:text-gray-300 mb-2">
-                使用 Agnes AI 分析这个需求
+                分析这个需求并生成产品方案
               </p>
               <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">
-                AI 将深入分析用户痛点，设计产品方案，包括核心功能、技术栈、商业模式等
+                分析用户痛点，设计核心功能、技术栈、商业模式等
               </p>
               <button
                 onClick={handleAnalyze}
-                className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full font-medium hover:opacity-90 transition shadow-lg"
+                className="px-6 py-2.5 bg-gray-900 dark:bg-white dark:text-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition"
               >
-                🚀 开始 AI 分析
+                开始分析
               </button>
               {error && (
                 <p className="mt-4 text-sm text-red-500">{error}</p>

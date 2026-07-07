@@ -61,24 +61,25 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
 
   return (
     <>
-      <div className="block py-4 group">
-        <div className="flex items-start gap-2">
+      <div className="py-4 group">
+        <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <a
               href={idea.sourceUrl || '#'}
               target={idea.sourceUrl ? '_blank' : undefined}
               rel={idea.sourceUrl ? 'noopener noreferrer' : undefined}
+              className="block"
             >
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
+              <h3 className="text-[15px] font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition leading-snug">
                 {idea.title}
               </h3>
             </a>
 
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
               {idea.description}
             </p>
 
-            <div className="mt-2 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${meta.bgClass} ${meta.textClass}`}>
                 {meta.label}
               </span>
@@ -86,41 +87,39 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
                 <span className="text-blue-500 dark:text-blue-400">by {idea.author}</span>
               )}
               <span>{formatTime(idea.publishedAt)}</span>
-              <span className="flex items-center gap-0.5">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l4-4z" />
-                </svg>
-                {idea.heat}
-              </span>
+              {idea.heat > 0 && (
+                <span className="flex items-center gap-0.5">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l4-4z" />
+                  </svg>
+                  {idea.heat}
+                </span>
+              )}
             </div>
           </div>
 
-          {/* 右侧操作区 */}
           <div className="flex flex-col items-end gap-2 shrink-0">
             <button
               onClick={handleGenerate}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:opacity-90 transition shadow-sm"
+              className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span>生成点子</span>
+              生成点子
             </button>
 
             {productCount > 0 && firstProduct && (
               productCount === 1 ? (
                 <a
                   href={`/product/${firstProduct.id}`}
-                  className="text-xs text-green-600 dark:text-green-400 hover:underline"
+                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
                 >
-                  → {firstProduct.name}
+                  {firstProduct.name}
                 </a>
               ) : (
                 <a
                   href={`/idea/${idea.id}/products`}
-                  className="text-xs text-green-600 dark:text-green-400 hover:underline"
+                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
                 >
-                  → {productCount} 个产品方案
+                  {productCount} 个方案
                 </a>
               )
             )}
