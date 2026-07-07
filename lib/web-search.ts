@@ -40,11 +40,13 @@ export async function webSearch(query: string, maxResults: number = 10): Promise
 
     let match
     while ((match = resultRegex.exec(html)) !== null) {
-      // DuckDuckGo wraps URLs in redirect, extract actual URL
       const href = match[1]
+      // Extract actual URL from DuckDuckGo redirect
       const urlMatch = href.match(/uddg=([^&]+)/)
-      const url = urlMatch ? decodeURIComponent(urlMatch[1]) : href
-      const title = match[2].replace(/<[^>]+>/g, '').trim()
+      let url = urlMatch ? decodeURIComponent(urlMatch[1]) : href
+      // Handle protocol-relative URLs
+      if (url.startsWith('//')) url = 'https:' + url
+      const title = match[2].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim()
       if (url && title) {
         links.push(url)
         titles.push(title)
