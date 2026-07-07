@@ -30,13 +30,34 @@ function parseRSS(xml: string): SearchResult[] {
 }
 
 function extractTag(block: string, tag: string): string {
-  const regex = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?</${tag}>`, 's')
+  // Try CDATA first
+  const cdataRegex = new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`, 'i')
+  const cdataMatch = block.match(cdataRegex)
+  if (cdataMatch) return cdataMatch[1].trim()
+
+  // Try normal tag
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i')
   const m = block.match(regex)
   return m ? m[1].trim() : ''
 }
 
 function cleanHTML(text: string): string {
-  return text.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').trim()
+  // Decode HTML entities first
+  let result = text
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)))
+  // Remove HTML tags
+  result = result.replace(/<[^>]*>/g, '')
+  // Remove markdown links
+  result = result.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+  // Clean up whitespace
+  result = result.replace(/\s+/g, ' ').trim()
+  return result
 }
 
 export async function webSearch(query: string, maxResults: number = 10): Promise<SearchResult[]> {
