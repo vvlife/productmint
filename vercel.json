@@ -8,6 +8,10 @@
     {
       "path": "/api/crawl",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/daily-collect",
+      "schedule": "0 9 * * *"
     }
   ]
 }

@@ -132,6 +132,10 @@ export default function Header() {
               社区
             </Link>
 
+            <Link href="/subscribe" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0">
+              订阅
+            </Link>
+
             {/* 桌面端搜索 */}
             <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2 flex-1 max-w-md">
               <input
