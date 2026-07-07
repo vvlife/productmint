@@ -7,21 +7,21 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { productId } = await req.json()
+    const { productId, title } = await req.json()
 
-    if (!productId) {
-      return NextResponse.json({ error: 'productId is required' }, { status: 400 })
-    }
+    let productTitle = title || '未命名讨论'
 
-    const product = await getProduct(productId)
-    if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    if (productId) {
+      const product = await getProduct(productId)
+      if (product) {
+        productTitle = product.name
+      }
     }
 
     const session: BrainstormSession = {
       id: `bs_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      productId,
-      productTitle: product.name,
+      productId: productId || '',
+      productTitle,
       status: 'active',
       participants: [],
       requirementCount: 0,

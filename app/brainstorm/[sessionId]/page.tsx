@@ -168,7 +168,28 @@ export default function BrainstormPage() {
       <div className="py-20 text-center">
         <p className="text-4xl mb-4">🔍</p>
         <p className="text-gray-500 dark:text-gray-400 mb-2">Brainstorm 会话不存在</p>
-        <Link href="/" className="text-blue-500 hover:underline text-sm">返回首页</Link>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">可能已被删除或链接无效</p>
+        <div className="flex gap-3 justify-center">
+          <Link href="/" className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
+            返回首页
+          </Link>
+          <button
+            onClick={async () => {
+              const resp = await fetch('/api/brainstorm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: '新讨论' }),
+              })
+              if (resp.ok) {
+                const { session } = await resp.json()
+                window.location.href = `/brainstorm/${session.id}`
+              }
+            }}
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition"
+          >
+            创建新讨论
+          </button>
+        </div>
       </div>
     )
   }
