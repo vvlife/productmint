@@ -94,7 +94,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-gray-950">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">核心功能</h2>
@@ -174,7 +174,7 @@ export default function LandingPage() {
       </section>
 
       {/* Tech Stack Section */}
-      <section className="py-24 px-4 border-t border-white/5">
+      <section className="py-24 px-4 border-t border-white/5 bg-gray-950">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">技术栈</h2>
@@ -205,7 +205,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-gray-950">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">开始使用</h2>
           <p className="text-gray-400 mb-8">免费使用，无需注册</p>
@@ -222,7 +222,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-white/5">
+      <footer className="py-8 px-4 border-t border-white/5 bg-gray-950">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">Idea</span>
