@@ -169,7 +169,7 @@ export async function POST() {
 
       // 生成预览链接
       const token = generatePreviewToken(sub.email, ideaId, result.title, result.description)
-      const previewUrl = `https://ideahub-pearl.vercel.app/preview/${token}`
+      const previewUrl = `https://ideahub-pearl.vercel.app/preview/${encodeURIComponent(token)}`
 
       // 发送邮件
       await sendEmail(
