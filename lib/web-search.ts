@@ -1,10 +1,6 @@
 /**
- * Web search via DuckDuckGo (no API key needed)
+ * Web search via DuckDuckGo API (no scraping needed)
  */
-
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-}
 
 interface SearchResult {
   title: string
@@ -14,58 +10,51 @@ interface SearchResult {
 
 export async function webSearch(query: string, maxResults: number = 10): Promise<SearchResult[]> {
   try {
-    const params = new URLSearchParams({
-      q: query,
-      t: 'h_',
-      ia: 'web',
-    })
-
-    const resp = await fetch(`https://html.duckduckgo.com/html/?${params}`, {
-      headers: HEADERS,
+    const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`, {
       signal: AbortSignal.timeout(10000),
     })
-
     if (!resp.ok) return []
 
-    const html = await resp.text()
+    const data = await resp.json()
     const results: SearchResult[] = []
 
-    // Parse DuckDuckGo HTML results
-    const resultRegex = /<a[^>]*class="result__a"[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi
-    const snippetRegex = /<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi
-
-    const links: string[] = []
-    const titles: string[] = []
-    const snippets: string[] = []
-
-    let match
-    while ((match = resultRegex.exec(html)) !== null) {
-      const href = match[1]
-      // Extract actual URL from DuckDuckGo redirect
-      const urlMatch = href.match(/uddg=([^&]+)/)
-      let url = urlMatch ? decodeURIComponent(urlMatch[1]) : href
-      // Handle protocol-relative URLs
-      if (url.startsWith('//')) url = 'https:' + url
-      const title = match[2].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim()
-      if (url && title) {
-        links.push(url)
-        titles.push(title)
-      }
-    }
-
-    while ((match = snippetRegex.exec(html)) !== null) {
-      snippets.push(match[1].replace(/<[^>]+>/g, '').trim())
-    }
-
-    for (let i = 0; i < Math.min(titles.length, maxResults); i++) {
+    // Add abstract if available
+    if (data.AbstractText && data.AbstractURL) {
       results.push({
-        title: titles[i],
-        description: snippets[i] || '',
-        url: links[i] || '',
+        title: data.Heading || query,
+        description: data.AbstractText,
+        url: data.AbstractURL,
       })
     }
 
-    return results
+    // Add related topics
+    if (data.RelatedTopics) {
+      for (const topic of data.RelatedTopics) {
+        if (results.length >= maxResults) break
+        if (topic.Text && topic.FirstURL) {
+          results.push({
+            title: topic.Text.split(' - ')[0] || topic.Text.substring(0, 60),
+            description: topic.Text,
+            url: topic.FirstURL,
+          })
+        }
+        // Handle sub-topics
+        if (topic.Topics) {
+          for (const sub of topic.Topics) {
+            if (results.length >= maxResults) break
+            if (sub.Text && sub.FirstURL) {
+              results.push({
+                title: sub.Text.split(' - ')[0] || sub.Text.substring(0, 60),
+                description: sub.Text,
+                url: sub.FirstURL,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    return results.slice(0, maxResults)
   } catch {
     return []
   }
