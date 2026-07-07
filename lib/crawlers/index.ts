@@ -8,10 +8,15 @@ import { crawlReddit } from './reddit'
 import { crawlWeibo } from './weibo'
 import { crawlZhihu } from './zhihu'
 import { crawlGitHubTrending } from './github-trending'
+import { crawlGitHubIssues } from './github-issues'
 import { crawl36kr } from './36kr'
 import { crawlDevto } from './devto'
 import { crawlIndieHackers } from './indiehackers'
 import { crawlSSPAI } from './sspai'
+import { crawlTwitter } from './twitter'
+import { crawlXiaohongshu } from './xiaohongshu'
+import { crawlAppStoreReviews } from './appstore'
+import { crawlPHComments } from './ph-comments'
 
 export interface CrawlResult {
   ideas: Idea[]
@@ -21,14 +26,22 @@ export interface CrawlResult {
 // ── Run all crawlers in parallel, collect results ──────────────
 export async function crawlAll(): Promise<CrawlResult> {
   const crawlers: Array<{ name: string; fn: () => Promise<RawIdea[]> }> = [
+    // 社交媒体需求
+    { name: 'Twitter', fn: crawlTwitter },
+    { name: '小红书', fn: crawlXiaohongshu },
+    { name: 'AppStore', fn: crawlAppStoreReviews },
+    { name: 'PH评论', fn: crawlPHComments },
+    { name: 'GitHub需求', fn: crawlGitHubIssues },
+    // 技术社区
     { name: 'V2EX', fn: crawlV2EX },
     { name: 'HackerNews', fn: crawlHackerNews },
     { name: 'ProductHunt', fn: crawlProductHunt },
     { name: 'Reddit', fn: crawlReddit },
-    { name: 'GitHub', fn: crawlGitHubTrending },
-    { name: '36Kr', fn: crawl36kr },
+    { name: 'GitHub Trending', fn: crawlGitHubTrending },
     { name: 'Dev.to', fn: crawlDevto },
     { name: 'IndieHackers', fn: crawlIndieHackers },
+    // 中文内容
+    { name: '36Kr', fn: crawl36kr },
     { name: 'SSPAI', fn: crawlSSPAI },
     { name: 'Weibo', fn: crawlWeibo },
     { name: 'Zhihu', fn: crawlZhihu },
