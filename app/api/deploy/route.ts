@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 公网链接就是 IdeaHub 自身的 /p/{productId} 路由
-    const host = req.headers.get('host') || 'ideahunt.vercel.app'
+    const host = req.headers.get('host') || 'productmint.vercel.app'
     const deployUrl = `https://${host}/p/${productId}`
 
     await updateProductDeployUrl(productId, deployUrl)

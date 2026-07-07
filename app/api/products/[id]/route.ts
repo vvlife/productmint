@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getProduct, deleteProduct, getProductsByIdea } from '@/lib/remote-store'
+import { getProduct, deleteProduct, getProductsByIdea, updateProductHtml, setCurrentVersion, updateProductDeployUrl } from '@/lib/remote-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -29,6 +29,59 @@ export async function GET(
       )
     }
     return NextResponse.json({ product })
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH /api/products/[id] — 异步写回生成的产品 HTML
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await req.json()
+    const { generatedHtml, currentVersion, deployUrl } = body
+
+    if (typeof currentVersion === 'number') {
+      const ok = await setCurrentVersion(params.id, currentVersion)
+      if (!ok) {
+        return NextResponse.json(
+          { error: 'Product not found or version not found' },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json({ success: true, currentVersion })
+    }
+
+    if (typeof deployUrl === 'string') {
+      const ok = await updateProductDeployUrl(params.id, deployUrl)
+      if (!ok) {
+        return NextResponse.json(
+          { error: 'Product not found' },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json({ success: true, deployUrl })
+    }
+
+    if (typeof generatedHtml !== 'string') {
+      return NextResponse.json(
+        { error: 'generatedHtml (string) or currentVersion (number) is required' },
+        { status: 400 }
+      )
+    }
+    const success = await updateProductHtml(params.id, generatedHtml)
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Product not found or update failed' },
+        { status: 404 }
+      )
+    }
+    return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },

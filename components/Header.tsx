@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Notifications from './Notifications'
 
 type RefreshState = 'idle' | 'loading' | 'success' | 'error'
 
@@ -74,8 +75,8 @@ export default function Header() {
       <div className="mx-auto max-w-content px-4">
         <div className="flex items-center justify-between h-14 gap-4">
           <Link href="/" className="flex items-center gap-1.5 shrink-0">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Idea</span>
-            <span className="text-xl font-bold text-blue-500">Hub</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">Product</span>
+            <span className="text-xl font-bold text-blue-500">Mint</span>
           </Link>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md">
@@ -109,6 +110,8 @@ export default function Header() {
             </svg>
             <span className="hidden sm:inline">{buttonLabel}</span>
           </button>
+
+          <Notifications />
         </div>
       </div>
     </header>

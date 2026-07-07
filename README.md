@@ -1,4 +1,4 @@
-# IdeaHub
+# ProductMint
 
 > From Idea to Product.
 

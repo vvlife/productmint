@@ -3,8 +3,8 @@ import './globals.css'
 import Header from '@/components/Header'
 
 export const metadata: Metadata = {
-  title: 'IdeaHub - 创业需求聚合平台',
-  description: '搜集社交媒体上的热点需求，汇聚成时间线，给创业者参考。',
+  title: 'ProductMint - From Idea to Product',
+  description: 'Turn startup ideas into real products.',
 }
 
 export const viewport: Viewport = {
@@ -41,7 +41,7 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="mx-auto max-w-content px-4 py-8 text-center text-xs text-gray-400 dark:text-gray-600">
-          <p>IdeaHub · 创业需求聚合平台 · 数据仅供参考</p>
+          <p>ProductMint · From Idea to Product</p>
         </footer>
       </body>
     </html>

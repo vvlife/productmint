@@ -59,10 +59,10 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'agnes-2.0-flash',
         messages: [
-          { role: 'system', content: '你是一个资深产品经理和创业顾问，擅长分析用户需求并设计产品方案。请只输出 JSON，不要输出 markdown 代码块标记。' },
+          { role: 'system', content: '你是一个资深产品经理和创业顾问，擅长分析用户需求并设计产品方案。必须且只输出一个合法的 JSON 对象，不要输出任何 markdown 代码块标记或解释文字，不要使用代码围栏。' },
           { role: 'user', content: prompt },
         ],
-        temperature: 0.7,
+        temperature: 0.4,
       }),
     })
 
@@ -76,41 +76,59 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json()
-    let content = data.choices?.[0]?.message?.content || ''
+    const content = data.choices?.[0]?.message?.content || ''
 
-    // 清理可能的 markdown 代码块标记
-    content = content.trim()
-    if (content.startsWith('```json')) {
-      content = content.slice(7)
-    }
-    if (content.startsWith('```')) {
-      content = content.slice(3)
-    }
-    if (content.endsWith('```')) {
-      content = content.slice(0, -3)
-    }
-    content = content.trim()
-
-    let product
     try {
-      product = JSON.parse(content)
-    } catch {
-      // 如果 JSON 解析失败，返回原始内容
+      const product = parseProductJson(content)
+      return NextResponse.json({ success: true, product })
+    } catch (e) {
       return NextResponse.json({
         error: 'Failed to parse AI response as JSON',
-        raw: content,
+        detail: e instanceof Error ? e.message : String(e),
+        raw: content.slice(0, 800),
       }, { status: 502 })
     }
-
-    return NextResponse.json({
-      success: true,
-      product,
-    })
   } catch (error) {
     console.error('Analyze API error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
+  }
+}
+
+// 从 AI 返回文本中尽量稳健地提取产品方案 JSON
+function parseProductJson(raw: string): Record<string, unknown> {
+  if (!raw) throw new Error('empty response')
+
+  let text = raw.trim()
+
+  // 1) 去掉 markdown 代码块围栏（```json / ``` / ~~~）
+  text = text.replace(/^```(?:json)?\s*/i, '')
+  text = text.replace(/\s*```$/i, '')
+  text = text.replace(/^~~~\s*/i, '')
+  text = text.replace(/\s*~~~$/i, '')
+  text = text.trim()
+
+  // 2) 截取第一个 { 到最后一个 } 之间的内容（容忍前后多余文字）
+  const firstBrace = text.indexOf('{')
+  const lastBrace = text.lastIndexOf('}')
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    text = text.slice(firstBrace, lastBrace + 1)
+  }
+
+  // 3) 先直接解析
+  try {
+    return JSON.parse(text)
+  } catch {
+    // 4) 尝试修复常见问题：结尾多余逗号、未加引号的 key
+    const fixed = text
+      .replace(/,\s*([}\]])/g, '$1')      // 去掉对象/数组末尾的逗号
+      .replace(/([{\[,]\s*)(\w+)\s*:/g, '$1"$2":')  // 给未加引号的 key 加引号
+    try {
+      return JSON.parse(fixed)
+    } catch (e) {
+      throw new Error('cleaned text still invalid: ' + (e as Error).message)
+    }
   }
 }

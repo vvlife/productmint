@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Idea, Product } from '@/lib/types'
+import { addNotification, updateNotification, subscribe, getNotifications, type AppNotification } from '@/lib/notify'
 import Link from 'next/link'
 
 interface AnalysisModalProps {
@@ -10,7 +11,15 @@ interface AnalysisModalProps {
   onProductCreated: (product: Product) => void
 }
 
-type Step = 'idle' | 'analyzing' | 'result' | 'saving' | 'saved'
+type Step = 'idle' | 'analyzing' | 'result' | 'saving' | 'saved' | 'generating' | 'done'
+
+interface GenInfo {
+  state: 'idle' | 'generating' | 'done' | 'error'
+  progress: number
+  stage: string
+  productId?: string
+  notifId?: string
+}
 
 export default function AnalysisModal({
   idea,
@@ -22,6 +31,35 @@ export default function AnalysisModal({
   const [error, setError] = useState<string | null>(null)
   const [existingProducts, setExistingProducts] = useState<Product[]>([])
   const [loadingProducts, setLoadingProducts] = useState(true)
+  const [savedProduct, setSavedProduct] = useState<Product | null>(null)
+  const [genInfo, setGenInfo] = useState<GenInfo>({ state: 'idle', progress: 0, stage: '正在构思产品原型与交互...' })
+
+  // 订阅站内信：实时把生成进度/结果同步到弹窗（弹窗关闭重开也能恢复）
+  useEffect(() => {
+    const sync = () => {
+      const items = getNotifications()
+      const gen = items.find(n => n.type === 'generating' || n.type === 'done' || n.type === 'error')
+      if (!gen) return
+      setGenInfo(prev => ({
+        state: gen.type === 'generating' ? 'generating' : gen.type === 'error' ? 'error' : 'done',
+        progress: gen.progress || (gen.type === 'done' || gen.type === 'error' ? 100 : prev.progress),
+        stage: gen.body || prev.stage,
+        productId: gen.href?.replace(/.*\/product\//, '').replace(/\/app$/, ''),
+        notifId: gen.id,
+      }))
+    }
+    sync()
+    const unsub = subscribe(sync)
+    window.addEventListener('ideahub:notification', sync)
+    return () => {
+      unsub()
+      window.removeEventListener('ideahub:notification', sync)
+    }
+  }, [])
+
+  // 标准化分析结果中的数组字段，兼容 AI 返回对象/字符串的情况
+  const coreFeatures = analysis ? normalizeList(analysis.coreFeatures) : []
+  const techStack = analysis ? normalizeList(analysis.techStack) : []
 
   // 加载已有产品
   useEffect(() => {
@@ -59,7 +97,11 @@ export default function AnalysisModal({
       })
       const data = await resp.json()
       if (!resp.ok || !data.success) {
-        throw new Error(data.error || data.raw || '分析失败')
+        let msg = data.error || '分析失败'
+        if (msg === 'Failed to parse AI response as JSON') {
+          msg = 'AI 返回内容格式异常，请重试（可调整需求描述或稍后再试）'
+        }
+        throw new Error(msg)
       }
       setAnalysis(data.product)
       setStep('result')
@@ -96,9 +138,9 @@ export default function AnalysisModal({
       tagline: analysis.tagline || '',
       problem: analysis.problem || '',
       solution: analysis.solution || '',
-      targetUsers: analysis.targetUsers || '',
-      coreFeatures: analysis.coreFeatures || [],
-      techStack: analysis.techStack || [],
+      targetUsers: toText(analysis.targetUsers),
+      coreFeatures: normalizeList(analysis.coreFeatures),
+      techStack: normalizeList(analysis.techStack),
       monetization: analysis.monetization || '',
       competitors: analysis.competitors || '',
       differentiator: analysis.differentiator || '',
@@ -107,6 +149,7 @@ export default function AnalysisModal({
       status: 'confirmed',
     }
 
+    // 1) 先同步保存产品方案（不含可运行页面），进入生成中状态
     try {
       const resp = await fetch('/api/products', {
         method: 'POST',
@@ -118,11 +161,96 @@ export default function AnalysisModal({
         throw new Error(data.error || '保存失败')
       }
       onProductCreated(product)
+      setSavedProduct(product)
       setExistingProducts(prev => [product, ...prev])
-      setStep('saved')
+      setStep('generating')
     } catch (e) {
       setError(e instanceof Error ? e.message : '未知错误')
       setStep('result')
+      return
+    }
+
+    // 2) 异步（非阻塞）生成可运行产品页面，完成后写回并通知
+    generateProductPage(product)
+  }
+
+  // 异步生成产品页面：成功后 PATCH 写回，并通过站内信通知用户
+  const generateProductPage = async (product: Product) => {
+    // 站内信：先写一条 generating 进度通知（弹窗外也能看到）
+    const notif = addNotification({
+      title: `⏳ 正在生成「${product.name}」`,
+      body: '正在构思产品原型与交互...',
+      type: 'generating',
+      progress: 10,
+      href: `/product/${product.id}/app`,
+    })
+    setGenInfo({ state: 'generating', progress: 10, stage: '正在构思产品原型与交互...', productId: product.id, notifId: notif.id })
+
+    try {
+      // 阶段推进：开始请求
+      updateNotification(notif.id, { progress: 35, body: 'AI 正在编写界面与交互逻辑...' })
+      setGenInfo(prev => ({ ...prev, progress: 35, stage: 'AI 正在编写界面与交互逻辑...' }))
+
+      const genResp = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: product.name,
+          tagline: product.tagline,
+          problem: product.problem,
+          solution: product.solution,
+          targetUsers: product.targetUsers,
+          coreFeatures: product.coreFeatures,
+          techStack: product.techStack,
+        }),
+      })
+      const genData = await genResp.json()
+      if (!genResp.ok || !genData.success || !genData.html) {
+        updateNotification(notif.id, {
+          type: 'error',
+          title: '⚠️ 产品页面生成失败',
+          body: '可运行页面生成未完成，你仍可在介绍页查看方案。',
+          progress: 100,
+        })
+        setGenInfo(prev => ({ ...prev, state: 'error', progress: 100, stage: '生成失败' }))
+        return
+      }
+
+      updateNotification(notif.id, { progress: 80, body: '正在打包可运行页面...' })
+      setGenInfo(prev => ({ ...prev, progress: 80, stage: '正在打包可运行页面...' }))
+
+      // 写回：作为第 1 个版本持久化（建立版本历史）
+      const verResp = await fetch(`/api/products/${product.id}/versions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: '' }),
+      })
+      // 若版本接口不可用，退回旧 PATCH 逻辑
+      if (!verResp.ok) {
+        await fetch(`/api/products/${product.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ generatedHtml: genData.html }),
+        })
+      }
+
+      // 站内信：更新为完成态
+      updateNotification(notif.id, {
+        type: 'done',
+        title: '🚀 你的产品页面已生成',
+        body: `「${product.name}」的可运行产品页面已经准备好了，点击查看并试用。`,
+        progress: 100,
+      })
+
+      if (step === 'generating') setStep('done')
+    } catch {
+      updateNotification(notif.id, {
+        type: 'error',
+        title: '⚠️ 产品页面生成失败',
+        body: '可运行页面生成未完成，你仍可在介绍页查看方案。',
+        progress: 100,
+      })
+      setGenInfo(prev => ({ ...prev, state: 'error', progress: 100, stage: '生成失败' }))
     }
   }
 
@@ -182,15 +310,15 @@ export default function AnalysisModal({
             </div>
           )}
 
-          {/* 保存成功 */}
+          {/* 保存成功（生成失败回退态） */}
           {step === 'saved' && (
             <div className="text-center py-12">
               <div className="text-5xl mb-4">✅</div>
               <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                产品已生成！
+                产品方案已保存
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                产品方案已保存，可以查看详情
+                可运行产品页面生成未完成，但你可以先查看方案详情。
               </p>
               <div className="flex gap-3 justify-center">
                 <button
@@ -200,11 +328,94 @@ export default function AnalysisModal({
                   关闭
                 </button>
                 <Link
-                  href={`/product/${existingProducts[0]?.id}`}
+                  href={`/product/${savedProduct?.id}`}
                   onClick={onClose}
                   className="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full hover:opacity-90 transition shadow-sm"
                 >
-                  查看产品详情 →
+                  查看方案 →
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* 生成中 / 失败 / 完成：由 genInfo.state 驱动，订阅站内信实时刷新 */}
+          {step === 'generating' && genInfo.state === 'generating' && (
+            <div className="text-center py-12">
+              <div className="relative inline-flex items-center justify-center mb-5">
+                <div className="w-14 h-14 rounded-full border-4 border-purple-100 dark:border-purple-900/40" />
+                <div className="absolute w-14 h-14 rounded-full border-4 border-transparent border-t-purple-500 animate-spin" />
+                <span className="absolute text-xl">🛠️</span>
+              </div>
+              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                正在生成产品页面…
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5" id="gen-status">
+                {genInfo.stage}
+              </p>
+              <div className="max-w-sm mx-auto h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-700"
+                  style={{ width: `${Math.max(8, Math.min(100, genInfo.progress))}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+                页面在后台生成，你可以关闭此弹窗，完成后会通过站内信通知你
+              </p>
+            </div>
+          )}
+
+          {/* 生成失败 */}
+          {step === 'generating' && genInfo.state === 'error' && (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-4">⚠️</div>
+              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                产品页面生成失败
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                可运行页面未能生成，但你仍可查看产品方案。
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  关闭
+                </button>
+                <Link
+                  href={`/product/${savedProduct?.id}`}
+                  onClick={onClose}
+                  className="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full hover:opacity-90 transition shadow-sm"
+                >
+                  查看方案 →
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* 生成完成 */}
+          {step === 'generating' && genInfo.state === 'done' && (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-4">🎉</div>
+              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                产品页面已生成！
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                可运行的产品页面已经准备好，点击即可试用。
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Link
+                  href={`/product/${savedProduct?.id}`}
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  查看方案
+                </Link>
+                <Link
+                  href={`/product/${savedProduct?.id}/app`}
+                  onClick={onClose}
+                  className="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-emerald-500 rounded-full hover:opacity-90 transition shadow-sm"
+                >
+                  👀 查看产品页面 →
                 </Link>
               </div>
             </div>
@@ -262,13 +473,13 @@ export default function AnalysisModal({
               <Section title="💡 解决方案" content={analysis.solution} />
               <Section title="👥 目标用户" content={analysis.targetUsers} />
 
-              {analysis.coreFeatures && analysis.coreFeatures.length > 0 && (
+              {coreFeatures.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     ⚡ 核心功能
                   </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {analysis.coreFeatures.map((f, i) => (
+                    <div className="flex flex-wrap gap-2">
+                    {coreFeatures.map((f, i) => (
                       <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
                         {f}
                       </span>
@@ -277,13 +488,13 @@ export default function AnalysisModal({
                 </div>
               )}
 
-              {analysis.techStack && analysis.techStack.length > 0 && (
+              {techStack.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     🛠 推荐技术栈
                   </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {analysis.techStack.map((t, i) => (
+                    <div className="flex flex-wrap gap-2">
+                    {techStack.map((t, i) => (
                       <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                         {t}
                       </span>
@@ -334,15 +545,44 @@ export default function AnalysisModal({
   )
 }
 
-function Section({ title, content }: { title: string; content?: string }) {
-  if (!content) return null
+// 把可能是字符串/对象/数组的字段安全地转成可显示的文本
+// 把可能是数组/字符串的字段统一转成字符串数组
+function normalizeList(value: unknown): string[] {
+  if (!value) return []
+  if (Array.isArray(value)) {
+    return value
+      .map(v => (typeof v === 'string' ? v : toText(v)))
+      .filter(Boolean)
+  }
+  if (typeof value === 'string') {
+    return value.split(/[\n,，、]/).map(s => s.trim()).filter(Boolean)
+  }
+  return [toText(value)]
+}
+
+function toText(value: unknown): string {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (Array.isArray(value)) return value.join('、')
+  if (typeof value === 'object') {
+    return Object.values(value as Record<string, unknown>)
+      .filter(v => v != null)
+      .map(v => (typeof v === 'string' ? v : JSON.stringify(v)))
+      .join('；')
+  }
+  return String(value)
+}
+
+function Section({ title, content }: { title: string; content?: unknown }) {
+  const text = toText(content)
+  if (!text) return null
   return (
     <div>
       <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
         {title}
       </h4>
       <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-        {content}
+        {text}
       </p>
     </div>
   )
