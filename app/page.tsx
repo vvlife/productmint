@@ -32,21 +32,6 @@ export default function HomePage() {
     if (savedName) setAuthor(savedName)
   }, [])
 
-  const loadFromCache = useCallback(() => {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY)
-      const cachedTime = localStorage.getItem(CACHE_TIME_KEY)
-      if (cached) {
-        const data = JSON.parse(cached)
-        setIdeas(data.ideas || [])
-        setCollections(data.collections || [])
-        setLastCrawlAt(cachedTime)
-        return true
-      }
-    } catch {}
-    return false
-  }, [])
-
   // 加载用户提交的需求（从 API）
   const loadUserIdeas = useCallback(async (): Promise<Idea[]> => {
     try {
@@ -58,6 +43,25 @@ export default function HomePage() {
     } catch {}
     return []
   }, [])
+
+  const loadFromCache = useCallback(async () => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      const cachedTime = localStorage.getItem(CACHE_TIME_KEY)
+      const userIdeas = await loadUserIdeas()
+      if (cached) {
+        const data = JSON.parse(cached)
+        setIdeas([...userIdeas, ...(data.ideas || [])])
+        setCollections(data.collections || [])
+        setLastCrawlAt(cachedTime)
+        return true
+      } else if (userIdeas.length > 0) {
+        setIdeas(userIdeas)
+        return false
+      }
+    } catch {}
+    return false
+  }, [loadUserIdeas])
 
   const fetchFromAPI = useCallback(async () => {
     try {

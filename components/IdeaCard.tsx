@@ -61,20 +61,29 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
     setFirstProduct(product)
   }
 
+  // 用户提交的需求点击后自动打开 AI 分析
+  const isUserIdea = idea.platform === 'other' || !!(idea as any).author
+
   return (
     <>
-      <div className="block py-4 group">
+      <div className="block py-4 group" onClick={isUserIdea ? handleAnalyze : undefined} style={isUserIdea ? { cursor: 'pointer' } : undefined}>
         <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
-            <a
-              href={idea.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            {isUserIdea ? (
               <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
                 {idea.title}
               </h3>
-            </a>
+            ) : (
+              <a
+                href={idea.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
+                  {idea.title}
+                </h3>
+              </a>
+            )}
             
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
               {idea.description}
@@ -84,6 +93,9 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${meta.bgClass} ${meta.textClass}`}>
                 {meta.label}
               </span>
+              {idea.author && (
+                <span className="text-blue-500 dark:text-blue-400">by {idea.author}</span>
+              )}
               <span>{formatTime(idea.publishedAt)}</span>
               <span className="flex items-center gap-0.5">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,6 +104,9 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
                 {idea.heat}
               </span>
               <span className="hidden sm:inline">{idea.category}</span>
+              {isUserIdea && (
+                <span className="text-indigo-500 dark:text-indigo-400">点击查看 →</span>
+              )}
             </div>
           </div>
 
