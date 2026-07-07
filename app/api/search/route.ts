@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { search } from '@/lib/store'
-import { crawlAllFeeds } from '@/lib/rss-fetcher'
+import { webSearch } from '@/lib/web-search'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,36 +15,29 @@ export async function GET(request: Request) {
   // 1. Search local cache
   const localResults = await search(q)
 
-  // 2. Also search RSS feeds live
-  let liveResults: any[] = []
+  // 2. Web search via DuckDuckGo
+  let webResults: any[] = []
   try {
-    const allFeeds = await crawlAllFeeds()
-    const query = q.toLowerCase()
-    liveResults = allFeeds
-      .filter(item => {
-        const text = `${item.title} ${item.description}`.toLowerCase()
-        return text.includes(query)
-      })
-      .slice(0, 10)
-      .map((item, idx) => ({
-        type: 'idea' as const,
-        id: `live_${Date.now()}_${idx}`,
-        title: item.title,
-        description: item.description,
-        platform: 'other',
-        sourceUrl: item.sourceUrl,
-        publishedAt: item.publishedAt,
-        heat: item.heat,
-        category: '其他',
-      }))
+    const webItems = await webSearch(`${q} 创业 产品 需求`, 10)
+    webResults = webItems.map((item, idx) => ({
+      type: 'idea' as const,
+      id: `web_${Date.now()}_${idx}`,
+      title: item.title,
+      description: item.description,
+      platform: 'other',
+      sourceUrl: item.url,
+      publishedAt: new Date().toISOString(),
+      heat: 0,
+      category: '其他',
+    }))
   } catch {}
 
-  // 3. Merge: local first, then live (dedup by title)
+  // 3. Merge: local first, then web (dedup by title)
   const seenTitles = new Set(localResults.results.map((r: any) => r.title?.toLowerCase()))
-  const uniqueLive = liveResults.filter((r: any) => !seenTitles.has(r.title?.toLowerCase()))
+  const uniqueWeb = webResults.filter((r: any) => !seenTitles.has(r.title?.toLowerCase()))
 
   return NextResponse.json({
-    results: [...localResults.results, ...uniqueLive],
-    total: localResults.results.length + uniqueLive.length,
+    results: [...localResults.results, ...uniqueWeb],
+    total: localResults.results.length + uniqueWeb.length,
   })
 }
