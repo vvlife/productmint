@@ -84,9 +84,26 @@ export default function HomePage() {
 
   useEffect(() => {
     const init = async () => {
-      const hasCache = loadFromCache()
+      const hasCache = await loadFromCache()
       if (!hasCache) {
-        await fetchFromAPI()
+        const hasData = await fetchFromAPI()
+        // 如果还没数据，自动触发一次抓取
+        if (!hasData) {
+          try {
+            const resp = await fetch('/api/crawl', { method: 'POST', cache: 'no-store' })
+            if (resp.ok) {
+              const data = await resp.json()
+              if (data.ideas?.length > 0) {
+                setIdeas(data.ideas)
+                setCollections(data.collections || [])
+                setLastCrawlAt(data.crawledAt)
+                // 写入缓存
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ ideas: data.ideas, collections: data.collections }))
+                localStorage.setItem(CACHE_TIME_KEY, data.crawledAt)
+              }
+            }
+          } catch {}
+        }
       }
       setLoading(false)
     }
