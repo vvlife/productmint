@@ -1,22 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Product, ProductVersion } from '@/lib/types'
-
-// game-leaderboard SDK 类型声明
-declare global {
-  interface Window {
-    API?: {
-      setGame: (gameId: string) => void
-      getGame: () => string
-      createGame: (gameId: string, name: string, desc: string, playUrl?: string) => Promise<{ data: any }>
-      deployGame: (gameId: string, html: string) => Promise<{ url: string }>
-      updateGameUrl: (gameId: string, url: string) => Promise<{ data: any }>
-    }
-  }
-}
 
 export default function ProductAppPage() {
   const params = useParams()
@@ -24,8 +11,6 @@ export default function ProductAppPage() {
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [sdkReady, setSdkReady] = useState(false)
-  const sdkLoadedRef = useRef(false)
 
   // 调整 / 版本相关
   const [showAdjust, setShowAdjust] = useState(false)
@@ -54,38 +39,6 @@ export default function ProductAppPage() {
   useEffect(() => {
     loadProduct()
   }, [loadProduct])
-
-  // 加载 game-leaderboard SDK
-  useEffect(() => {
-    if (sdkLoadedRef.current) return
-    sdkLoadedRef.current = true
-
-    const loadScript = (src: string): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) {
-          resolve()
-          return
-        }
-        const script = document.createElement('script')
-        script.src = src
-        script.onload = () => resolve()
-        script.onerror = () => reject(new Error(`Failed to load ${src}`))
-        document.head.appendChild(script)
-      })
-    }
-
-    const initSDK = async () => {
-      try {
-        await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2')
-        await loadScript('https://leaderboard-skill.vercel.app/supabase-api.js')
-        setSdkReady(true)
-      } catch (e) {
-        console.warn('Failed to load leaderboard SDK:', e)
-      }
-    }
-
-    initSDK()
-  }, [])
 
   // 当前展示的版本 HTML
   const versions = product?.versions || []
@@ -118,33 +71,21 @@ export default function ProductAppPage() {
 
   const handleDeploy = async () => {
     if (!product || deployState === 'deploying') return
-    if (!sdkReady || !window.API) {
-      setDeployError('部署 SDK 未加载，请刷新页面重试')
-      setDeployState('error')
-      return
-    }
-
     setDeployState('deploying')
     setDeployError(null)
     try {
-      // 生成安全的 gameId（只包含小写字母、数字、连字符）
-      const gameId = `product-${product.id.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`
-
-      // 创建或更新游戏条目
-      await window.API.createGame(gameId, product.name, product.tagline, `${window.location.origin}/product/${product.id}/app`)
-      window.API.setGame(gameId)
-
-      // 部署 HTML 到公网
-      const result = await window.API.deployGame(gameId, activeHtml)
-
-      if (result && result.url) {
-        setDeployUrl(result.url)
-        setDeployState('done')
-        // 同步本地 product 状态
-        setProduct(p => p ? { ...p, deployUrl: result.url, deployedAt: new Date().toISOString() } : p)
-      } else {
-        throw new Error('部署返回结果无效')
+      const resp = await fetch('/api/deploy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id }),
+      })
+      const data = await resp.json()
+      if (!resp.ok || !data.success) {
+        throw new Error(data.error || '部署失败')
       }
+      setDeployUrl(data.url)
+      setDeployState('done')
+      setProduct(p => p ? { ...p, deployUrl: data.url, deployedAt: data.deployedAt } : p)
     } catch (e) {
       setDeployState('error')
       setDeployError(e instanceof Error ? e.message : '部署失败')
@@ -263,9 +204,9 @@ export default function ProductAppPage() {
 
           <button
             onClick={handleDeploy}
-            disabled={deployState === 'deploying' || genState === 'generating' || !sdkReady}
+            disabled={deployState === 'deploying' || genState === 'generating'}
             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full hover:opacity-90 transition shadow-sm disabled:opacity-50"
-            title={sdkReady ? '把当前版本部署到公网，生成可分享链接' : '部署 SDK 加载中...'}
+            title="把当前版本部署到公网，生成可分享链接"
           >
             {deployState === 'deploying' ? (
               <span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -274,7 +215,7 @@ export default function ProductAppPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.55 19.09l14-14a1.5 1.5 0 012.12 2.12l-14 14a1.5 1.5 0 01-2.12-2.12zM12 3l1.91 5.79L19.7 10.7l-5.79 1.91L12 18.5l-1.91-5.79L4.3 10.7l5.79-1.91L12 3z" />
               </svg>
             )}
-            {!sdkReady ? 'SDK 加载中...' : (deployState === 'deploying' ? '部署中...' : (deployUrl ? '重新部署' : '部署到公网'))}
+            {deployState === 'deploying' ? '部署中...' : (deployUrl ? '重新部署' : '部署到公网')}
           </button>
 
           {/* 版本切换下拉 */}
