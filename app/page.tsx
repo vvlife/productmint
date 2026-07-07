@@ -13,7 +13,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [lastCrawlAt, setLastCrawlAt] = useState<string | null>(null)
 
-  // Load from localStorage on mount
   const loadFromCache = useCallback(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY)
@@ -29,7 +28,6 @@ export default function HomePage() {
     return false
   }, [])
 
-  // Fetch from API (fallback if no cache)
   const fetchFromAPI = useCallback(async () => {
     try {
       const resp = await fetch('/api/feed', { cache: 'no-store' })
@@ -56,7 +54,6 @@ export default function HomePage() {
     init()
   }, [loadFromCache, fetchFromAPI])
 
-  // Listen for crawl completion events (from Header refresh)
   useEffect(() => {
     const handleCrawlComplete = (e: CustomEvent) => {
       const { ideas: newIdeas, collections: newCols, crawledAt } = e.detail || {}
@@ -70,45 +67,32 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-        </div>
-        <div className="py-20 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
-          <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">加载中...</p>
-        </div>
-      </>
+      <div className="py-20 text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">加载中...</p>
+      </div>
     )
   }
 
   if (ideas.length === 0 && collections.length === 0) {
     return (
-      <>
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-        </div>
-        <div className="py-20 text-center">
-          <p className="text-4xl mb-4">💡</p>
-          <p className="text-gray-500 dark:text-gray-400 mb-2">暂无需求数据</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
-            点击右上角「刷新」按钮，从各平台抓取最新需求
-          </p>
-        </div>
-      </>
+      <div className="py-20 text-center">
+        <p className="text-4xl mb-4">💡</p>
+        <p className="text-gray-500 dark:text-gray-400 mb-2">暂无数据</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">
+          点击右上角「刷新」按钮抓取最新内容
+        </p>
+      </div>
     )
   }
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-        {lastCrawlAt && (
-          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-            上次抓取：{new Date(lastCrawlAt).toLocaleString('zh-CN')}
-          </p>
-        )}
-      </div>
+      {lastCrawlAt && (
+        <p className="mb-4 text-xs text-gray-400 dark:text-gray-500">
+          上次抓取：{new Date(lastCrawlAt).toLocaleString('zh-CN')}
+        </p>
+      )}
       <Timeline ideas={ideas} collections={collections} />
     </>
   )

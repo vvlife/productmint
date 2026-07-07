@@ -1,4 +1,4 @@
-# V-Studio
+# IdeaHub
 
 > From Idea to Product.
 
