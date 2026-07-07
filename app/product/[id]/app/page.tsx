@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Product, ProductVersion } from '@/lib/types'
+import { addNotification } from '@/lib/notify'
 
 export default function ProductAppPage() {
   const params = useParams()
@@ -86,6 +87,12 @@ export default function ProductAppPage() {
       setDeployUrl(data.url)
       setDeployState('done')
       setProduct(p => p ? { ...p, deployUrl: data.url, deployedAt: data.deployedAt } : p)
+      addNotification({
+        title: '部署成功',
+        body: `「${product.name}」已部署到公网`,
+        href: `/product/${product.id}/app`,
+        type: 'done',
+      })
     } catch (e) {
       setDeployState('error')
       setDeployError(e instanceof Error ? e.message : '部署失败')

@@ -73,7 +73,6 @@ export default function HomePage() {
       <>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">搜集社交媒体上的热点需求，发现创业机会</p>
         </div>
         <div className="py-20 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
@@ -88,7 +87,6 @@ export default function HomePage() {
       <>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">搜集社交媒体上的热点需求，发现创业机会</p>
         </div>
         <div className="py-20 text-center">
           <p className="text-4xl mb-4">💡</p>
@@ -105,7 +103,6 @@ export default function HomePage() {
     <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">创业需求时间线</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">搜集社交媒体上的热点需求，发现创业机会</p>
         {lastCrawlAt && (
           <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
             上次抓取：{new Date(lastCrawlAt).toLocaleString('zh-CN')}
