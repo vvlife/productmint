@@ -17,7 +17,8 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
   // 解析 token
   let ideaData
   try {
-    ideaData = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'))
+    const decoded = atob(token)
+    ideaData = JSON.parse(decoded)
   } catch {
     return (
       <div className="py-20 text-center">
