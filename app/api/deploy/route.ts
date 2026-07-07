@@ -23,9 +23,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 公网链接就是 IdeaHub 自身的 /p/{productId} 路由
-    const origin = req.headers.get('origin') || req.headers.get('host') || ''
-    const protocol = origin.includes('localhost') ? 'http' : 'https'
-    const deployUrl = `${protocol}://${origin}/p/${productId}`
+    const host = req.headers.get('host') || 'ideahub-ecru.vercel.app'
+    const deployUrl = `https://${host}/p/${productId}`
 
     await updateProductDeployUrl(productId, deployUrl)
 
