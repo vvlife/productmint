@@ -121,6 +121,13 @@ export default function HomePage() {
   useEffect(() => {
     const handleShowSubmit = () => setShowSubmit(true)
     window.addEventListener('ideahub:show-submit', handleShowSubmit)
+
+    // 检查是否需要从其他页面跳转过来显示发布弹窗
+    if (localStorage.getItem('ideahub_show_submit') === '1') {
+      localStorage.removeItem('ideahub_show_submit')
+      setShowSubmit(true)
+    }
+
     return () => window.removeEventListener('ideahub:show-submit', handleShowSubmit)
   }, [])
 

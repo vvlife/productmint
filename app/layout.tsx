@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
+import LandingHeader from '@/components/LandingHeader'
 
 export const metadata: Metadata = {
   title: 'IdeaHub',
@@ -37,6 +38,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased min-h-screen">
+        <LandingHeader />
         <Header />
         <main className="mx-auto max-w-3xl px-4 py-6">
           {children}
