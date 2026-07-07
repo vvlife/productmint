@@ -1,25 +1,11 @@
 import type { Idea, Collection, CrawlResponse, CrawlStats, FeedResponse } from './types'
 import { crawlAll } from './crawlers'
 import { clusterIdeas } from './cluster'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 // ── In-memory cache (per serverless instance) ─────────────────
 let _ideas: Idea[] = []
 let _collections: Collection[] = []
 let _lastCrawlAt: string | null = null
-
-const USER_IDEAS_PATH = path.join(process.cwd(), '.data', 'user-ideas.json')
-
-async function loadUserIdeas(): Promise<Idea[]> {
-  try {
-    const raw = await fs.readFile(USER_IDEAS_PATH, 'utf-8')
-    const data = JSON.parse(raw)
-    return Array.isArray(data) ? data : []
-  } catch {
-    return []
-  }
-}
 
 // ── Trigger crawl: returns full data ──────────────────────────
 export async function triggerCrawl(): Promise<{
@@ -63,14 +49,11 @@ export async function triggerCrawl(): Promise<{
 
 // ── Get current cached data ───────────────────────────────────
 export async function getFeed(category?: string): Promise<FeedResponse> {
-  // 合并爬取的 ideas 和用户提交的 ideas
-  const userIdeas = await loadUserIdeas()
-  let allIdeas = [...userIdeas, ..._ideas]
-
+  let filtered = _ideas
   if (category && category !== 'all') {
-    allIdeas = allIdeas.filter(i => i.category === category)
+    filtered = filtered.filter(i => i.category === category)
   }
-  const sorted = allIdeas.sort((a, b) =>
+  const sorted = [...filtered].sort((a, b) =>
     new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   )
   return { ideas: sorted, collections: _collections, total: sorted.length }
@@ -97,10 +80,7 @@ export async function search(query: string) {
   const q = query.toLowerCase().trim()
   if (!q) return { results: [], total: 0 }
 
-  const userIdeas = await loadUserIdeas()
-  const allIdeas = [...userIdeas, ..._ideas]
-
-  const matchedIdeas = allIdeas.filter(i =>
+  const matchedIdeas = _ideas.filter(i =>
     i.title.toLowerCase().includes(q) ||
     i.description.toLowerCase().includes(q)
   )

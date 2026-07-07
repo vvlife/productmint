@@ -8,6 +8,7 @@ import { addNotification } from '@/lib/notify'
 const CACHE_KEY = 'ideahub_cache'
 const CACHE_TIME_KEY = 'ideahub_cache_time'
 const USER_KEY = 'ideahub_user_id'
+const USER_IDEAS_KEY = 'ideahub_user_ideas'
 
 export default function HomePage() {
   const [ideas, setIdeas] = useState<Idea[]>([])
@@ -36,12 +37,16 @@ export default function HomePage() {
     try {
       const cached = localStorage.getItem(CACHE_KEY)
       const cachedTime = localStorage.getItem(CACHE_TIME_KEY)
+      const userIdeas = JSON.parse(localStorage.getItem(USER_IDEAS_KEY) || '[]')
       if (cached) {
         const data = JSON.parse(cached)
-        setIdeas(data.ideas || [])
+        setIdeas([...userIdeas, ...(data.ideas || [])])
         setCollections(data.collections || [])
         setLastCrawlAt(cachedTime)
         return true
+      } else if (userIdeas.length > 0) {
+        setIdeas(userIdeas)
+        return false // 没有爬取缓存，但有用户需求
       }
     } catch {}
     return false
@@ -52,8 +57,11 @@ export default function HomePage() {
       const resp = await fetch('/api/feed', { cache: 'no-store' })
       if (resp.ok) {
         const data: FeedResponse = await resp.json()
-        if (data.ideas?.length > 0) {
-          setIdeas(data.ideas)
+        // 合并用户提交的需求
+        const userIdeas = JSON.parse(localStorage.getItem(USER_IDEAS_KEY) || '[]')
+        const allIdeas = [...userIdeas, ...(data.ideas || [])]
+        if (allIdeas.length > 0) {
+          setIdeas(allIdeas)
           setCollections(data.collections || [])
           return true
         }
@@ -95,21 +103,32 @@ export default function HomePage() {
     if (!title.trim() || !author.trim() || submitting) return
     setSubmitting(true)
     try {
-      const resp = await fetch('/api/ideas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), description: description.trim(), author: author.trim() }),
-      })
-      if (resp.ok) {
-        const { idea } = await resp.json()
-        // 把新需求加到列表最前面
-        setIdeas(prev => [idea, ...prev])
-        localStorage.setItem('ideahub_author', author)
-        setShowSubmit(false)
-        setTitle('')
-        setDescription('')
-        addNotification({ title: '需求发布成功', body: `「${idea.title}」已发布`, type: 'done' })
+      // 直接在客户端创建 idea 并存入 localStorage
+      const idea: Idea = {
+        id: `user_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        title: title.trim().slice(0, 150),
+        description: (description || title).trim().slice(0, 500),
+        author: author.trim().slice(0, 30),
+        platform: 'other' as any,
+        sourceUrl: '',
+        publishedAt: new Date().toISOString(),
+        heat: 1,
+        category: '其他',
       }
+
+      // 保存到 localStorage
+      const userIdeas = JSON.parse(localStorage.getItem(USER_IDEAS_KEY) || '[]')
+      userIdeas.unshift(idea)
+      if (userIdeas.length > 200) userIdeas.length = 200
+      localStorage.setItem(USER_IDEAS_KEY, JSON.stringify(userIdeas))
+
+      // 更新显示
+      setIdeas(prev => [idea, ...prev])
+      localStorage.setItem('ideahub_author', author)
+      setShowSubmit(false)
+      setTitle('')
+      setDescription('')
+      addNotification({ title: '需求发布成功', body: `「${idea.title}」已发布`, type: 'done' })
     } catch {}
     setSubmitting(false)
   }

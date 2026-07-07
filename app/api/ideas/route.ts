@@ -1,44 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const USER_IDEAS_PATH = path.join(process.cwd(), '.data', 'user-ideas.json')
-
-interface UserIdea {
-  id: string
-  title: string
-  description: string
-  author: string
-  platform: 'user'
-  sourceUrl: string
-  publishedAt: string
-  heat: number
-}
-
-async function loadUserIdeas(): Promise<UserIdea[]> {
-  try {
-    const raw = await fs.readFile(USER_IDEAS_PATH, 'utf-8')
-    return JSON.parse(raw)
-  } catch {
-    return []
-  }
-}
-
-async function saveUserIdeas(ideas: UserIdea[]): Promise<void> {
-  await fs.mkdir(path.dirname(USER_IDEAS_PATH), { recursive: true })
-  await fs.writeFile(USER_IDEAS_PATH, JSON.stringify(ideas, null, 2), 'utf-8')
-}
+// Vercel serverless 是只读文件系统
+// 用户需求存在客户端 localStorage，这个 API 只做参数校验
 
 export async function GET() {
-  try {
-    const ideas = await loadUserIdeas()
-    return NextResponse.json({ ideas })
-  } catch (error) {
-    return NextResponse.json({ ideas: [] })
-  }
+  return NextResponse.json({ ideas: [], note: 'stored in client localStorage' })
 }
 
 export async function POST(req: NextRequest) {
@@ -52,26 +21,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'author is required' }, { status: 400 })
     }
 
-    const ideas = await loadUserIdeas()
-    const newIdea: UserIdea = {
+    const idea = {
       id: `user_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       title: title.trim().slice(0, 150),
       description: (description || title).trim().slice(0, 500),
       author: author.trim().slice(0, 30),
-      platform: 'user',
+      platform: 'user' as const,
       sourceUrl: '',
       publishedAt: new Date().toISOString(),
       heat: 1,
     }
 
-    ideas.unshift(newIdea)
-    // 最多保留 200 条用户需求
-    if (ideas.length > 200) ideas.length = 200
-    await saveUserIdeas(ideas)
-
-    return NextResponse.json({ success: true, idea: newIdea })
+    return NextResponse.json({ success: true, idea })
   } catch (error) {
-    console.error('Submit idea error:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

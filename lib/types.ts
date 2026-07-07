@@ -31,6 +31,7 @@ export interface Idea {
   heat: number // discussion count / upvotes
   category: Category
   collectionId?: string
+  author?: string // 用户提交的需求作者
 }
 
 export interface Collection {
