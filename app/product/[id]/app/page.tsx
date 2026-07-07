@@ -171,7 +171,7 @@ export default function ProductAppPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
       </div>
     )
   }
@@ -180,7 +180,7 @@ export default function ProductAppPage() {
     return (
       <div className="py-20 text-center">
         <p className="text-4xl mb-4">📦</p>
-        <p className="text-gray-500 dark:text-gray-400 mb-2">{error || '产品不存在'}</p>
+        <p className="text-gray-500 mb-2">{error || '产品不存在'}</p>
         <Link href="/" className="text-blue-500 hover:underline text-sm">返回首页</Link>
       </div>
     )
@@ -190,10 +190,10 @@ export default function ProductAppPage() {
     return (
       <div className="max-w-2xl mx-auto py-20 text-center">
         <p className="text-4xl mb-4">🛠️</p>
-        <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+        <p className="text-lg font-medium text-gray-900 mb-2">
           这个产品还没有生成可运行页面
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <p className="text-sm text-gray-500 mb-6">
           当前仅有产品方案，可先查看方案详情。
         </p>
         <Link
@@ -209,22 +209,22 @@ export default function ProductAppPage() {
   return (
     <div className="h-[calc(100vh-3.5rem)] flex flex-col">
       {/* 顶部条 */}
-      <div className="flex items-center justify-between px-4 h-14 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0 gap-3">
+      <div className="flex items-center justify-between px-4 h-14 border-b border-gray-200 bg-white shrink-0 gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href={`/product/${product.id}`}
-            className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition shrink-0"
+            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             方案
           </Link>
-          <span className="text-gray-300 dark:text-gray-700">/</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[28vw]">
+          <span className="text-gray-300">/</span>
+          <span className="text-sm font-medium text-gray-900 truncate max-w-[28vw]">
             {product.name}
           </span>
-          <span className="px-2 py-0.5 text-[11px] rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 shrink-0">
+          <span className="px-2 py-0.5 text-[11px] rounded-full bg-green-50 text-green-600 shrink-0">
             实时运行
           </span>
         </div>
@@ -268,7 +268,7 @@ export default function ProductAppPage() {
               <select
                 value={currentVersion}
                 onChange={(e) => switchVersion(Number(e.target.value))}
-                className="appearance-none text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded-full pl-3 pr-8 py-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer focus:outline-none"
+                className="appearance-none text-xs font-medium text-gray-700 bg-gray-100 rounded-full pl-3 pr-8 py-1.5 hover:bg-gray-200 transition cursor-pointer focus:outline-none"
                 title="切换版本"
               >
                 {versions.slice().reverse().map((v: ProductVersion) => (
@@ -308,15 +308,15 @@ export default function ProductAppPage() {
 
       {/* 打榜邮箱输入 */}
       {showEmailInput && submitState !== 'done' && (
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-amber-50 dark:bg-amber-900/20 shrink-0">
+        <div className="px-4 py-3 border-b border-gray-200 bg-amber-50 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-amber-700 dark:text-amber-300">邮箱：</span>
+            <span className="text-xs text-amber-700">邮箱：</span>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="flex-1 max-w-xs px-2 py-1 text-xs rounded border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="flex-1 max-w-xs px-2 py-1 text-xs rounded border border-amber-200 bg-white focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <button
               onClick={handleSubmitLeaderboard}
@@ -337,8 +337,8 @@ export default function ProductAppPage() {
 
       {/* 调整输入区 */}
       {showAdjust && (
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 shrink-0">
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1.5">
+        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50/60 shrink-0">
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">
             输入你的调整要求，将生成一个新版本（不影响已有版本）
           </label>
           <div className="flex gap-2">
@@ -348,7 +348,7 @@ export default function ProductAppPage() {
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAdjust() } }}
               placeholder="例如：把主色调改成深色系，增加一个用户评价区"
               disabled={genState === 'generating'}
-              className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition disabled:opacity-60"
+              className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition disabled:opacity-60"
             />
             <button
               onClick={handleAdjust}
@@ -360,7 +360,7 @@ export default function ProductAppPage() {
             <button
               onClick={() => setShowAdjust(false)}
               disabled={genState === 'generating'}
-              className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition disabled:opacity-50 shrink-0"
+              className="px-3 py-2 text-sm text-gray-500 hover:text-gray-900 transition disabled:opacity-50 shrink-0"
             >
               取消
             </button>
@@ -369,7 +369,7 @@ export default function ProductAppPage() {
           {/* 生成进度 */}
           {genState !== 'idle' && (
             <div className="mt-3">
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1.5">
+              <div className="flex items-center gap-2 text-xs text-gray-500 mb-1.5">
                 {genState === 'generating' ? (
                   <span className="w-3.5 h-3.5 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
                 ) : (
@@ -377,7 +377,7 @@ export default function ProductAppPage() {
                 )}
                 <span>{genState === 'generating' ? genStage : '新版本生成失败，请重试'}</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${genState === 'error' ? 'bg-red-500' : 'bg-gradient-to-r from-purple-500 to-blue-500'}`}
                   style={{ width: `${genState === 'error' ? 100 : Math.max(8, genProgress)}%` }}
@@ -388,7 +388,7 @@ export default function ProductAppPage() {
 
           {/* 部署反馈 */}
           {deployState === 'done' && deployUrl && (
-            <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+            <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600">
               <span>✅ 已部署到公网：</span>
               <a href={deployUrl} target="_blank" rel="noopener noreferrer" className="underline break-all truncate max-w-[70%]">
                 {deployUrl}

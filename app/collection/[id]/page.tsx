@@ -43,7 +43,7 @@ export default function CollectionPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
       </div>
     )
   }
@@ -51,8 +51,8 @@ export default function CollectionPage() {
   if (!collection) {
     return (
       <div className="py-20 text-center">
-        <p className="text-gray-500 dark:text-gray-400 mb-4">集合不存在或已过期</p>
-        <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition">
+        <p className="text-gray-500 mb-4">集合不存在或已过期</p>
+        <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 transition">
           返回首页
         </Link>
       </div>
@@ -61,40 +61,40 @@ export default function CollectionPage() {
 
   return (
     <div>
-      <nav className="mb-4 text-xs text-gray-400 dark:text-gray-500">
+      <nav className="mb-4 text-xs text-gray-400">
         <Link href="/" className="hover:text-blue-500 transition">首页</Link>
         <span className="mx-1">/</span>
-        <span className="text-gray-600 dark:text-gray-300">集合</span>
+        <span className="text-gray-600">集合</span>
       </nav>
 
-      <div className="mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+      <div className="mb-6 pb-6 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-2">
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-600">
             需求集合
           </span>
-          <span className="text-xs text-gray-400 dark:text-gray-500">{collection.category}</span>
+          <span className="text-xs text-gray-400">{collection.category}</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+        <h1 className="text-xl font-bold text-gray-900 leading-tight">
           {collection.title}
         </h1>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+        <p className="mt-2 text-sm text-gray-600 leading-relaxed">
           {collection.summary}
         </p>
-        <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
+        <p className="mt-3 text-xs text-gray-400">
           共 {ideas.length} 条相关需求
         </p>
       </div>
 
-      <div className="divide-y divide-gray-100 dark:divide-gray-800">
+      <div className="divide-y divide-gray-100">
         {ideas.map(idea => (
           <IdeaCard key={idea.id} idea={idea} />
         ))}
       </div>
 
       {relatedIdeas.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-gray-100 dark:divide-gray-800">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">相关需求</h2>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <h2 className="text-sm font-semibold text-gray-700 mb-4">相关需求</h2>
+          <div className="divide-y divide-gray-100">
             {relatedIdeas.map(idea => (
               <IdeaCard key={idea.id} idea={idea} />
             ))}

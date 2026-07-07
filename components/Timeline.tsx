@@ -37,7 +37,7 @@ export default function Timeline({ ideas, collections }: Props) {
 
   if (timeline.length === 0) {
     return (
-      <div className="py-20 text-center text-gray-400 dark:text-gray-500">
+      <div className="py-20 text-center text-gray-400">
         <p className="text-lg">暂无内容</p>
       </div>
     )
@@ -47,12 +47,12 @@ export default function Timeline({ ideas, collections }: Props) {
     <div>
       {grouped.map(([dateLabel, items]) => (
         <div key={dateLabel}>
-          <div className="sticky top-14 z-40 py-2 bg-gray-50 dark:bg-gray-950">
-            <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+          <div className="sticky top-14 z-40 py-2 bg-gray-50">
+            <p className="text-xs font-medium text-gray-400">
               {dateLabel}
             </p>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="divide-y divide-gray-100">
             {items.map((item) =>
               item.type === 'idea' ? (
                 <IdeaCard key={`idea-${item.data.id}`} idea={item.data} />

@@ -8,9 +8,9 @@ import type { BrainstormSession, BrainstormRequirement } from '@/lib/types'
 type RequirementType = 'requirement' | 'feedback' | 'suggestion'
 
 const TYPE_LABELS: Record<RequirementType, { label: string; color: string }> = {
-  requirement: { label: '需求', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-  feedback: { label: '反馈', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-  suggestion: { label: '建议', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+  requirement: { label: '需求', color: 'bg-blue-100 text-blue-700' },
+  feedback: { label: '反馈', color: 'bg-amber-100 text-amber-700' },
+  suggestion: { label: '建议', color: 'bg-green-100 text-green-700' },
 }
 
 export default function BrainstormPage() {
@@ -157,7 +157,7 @@ export default function BrainstormPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
         <p className="mt-4 text-sm text-gray-400">加载中...</p>
       </div>
     )
@@ -167,10 +167,10 @@ export default function BrainstormPage() {
     return (
       <div className="py-20 text-center">
         <p className="text-4xl mb-4">🔍</p>
-        <p className="text-gray-500 dark:text-gray-400 mb-2">Brainstorm 会话不存在</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500 mb-4">可能已被删除或链接无效</p>
+        <p className="text-gray-500 mb-2">Brainstorm 会话不存在</p>
+        <p className="text-sm text-gray-400 mb-4">可能已被删除或链接无效</p>
         <div className="flex gap-3 justify-center">
-          <Link href="/" className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">
+          <Link href="/" className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition">
             返回首页
           </Link>
           <button
@@ -198,7 +198,7 @@ export default function BrainstormPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Link href={isActive ? `/product/${session.productId}` : '/'} className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition">
+      <Link href={isActive ? `/product/${session.productId}` : '/'} className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-6 transition">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -206,25 +206,25 @@ export default function BrainstormPage() {
       </Link>
 
       {/* 会话头部 */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 mb-6">
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-6 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Brainstorm
               </h1>
               <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                 isActive
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                  : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-gray-100 text-gray-500'
               }`}>
                 {isActive ? '进行中' : '已结束'}
               </span>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <p className="text-sm text-gray-600 mt-1">
               针对产品「{session.productTitle}」的协作需求讨论
             </p>
-            <div className="mt-2 flex items-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+            <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
               <span>{session.participants.length} 位参与者</span>
               <span>{session.requirementCount} 条需求</span>
               <span>{new Date(session.createdAt).toLocaleString('zh-CN')}</span>
@@ -253,28 +253,28 @@ export default function BrainstormPage() {
 
       {/* 合并结果弹窗 */}
       {showMergeResult && (
-        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-medium text-green-800 dark:text-green-300">合并结果</h3>
-            <button onClick={() => setShowMergeResult(false)} className="text-green-600 dark:text-green-400 hover:text-green-800">
+            <h3 className="font-medium text-green-800">合并结果</h3>
+            <button onClick={() => setShowMergeResult(false)} className="text-green-600 hover:text-green-800">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <pre className="text-sm text-green-700 dark:text-green-300 whitespace-pre-wrap font-mono">{mergedText}</pre>
+          <pre className="text-sm text-green-700 whitespace-pre-wrap font-mono">{mergedText}</pre>
         </div>
       )}
 
       {/* 需求列表 */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">
           协作需求列表
         </h2>
         {requirements.length === 0 ? (
-          <div className="py-12 text-center bg-gray-50 dark:bg-gray-900 rounded-xl">
+          <div className="py-12 text-center bg-gray-50 rounded-xl">
             <p className="text-4xl mb-3">💡</p>
-            <p className="text-gray-500 dark:text-gray-400">还没有需求，快来添加第一条吧！</p>
+            <p className="text-gray-500">还没有需求，快来添加第一条吧！</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -283,7 +283,7 @@ export default function BrainstormPage() {
               return (
                 <div
                   key={req.id}
-                  className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800"
+                  className="p-4 bg-gray-50 rounded-xl border border-gray-100"
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
@@ -291,15 +291,15 @@ export default function BrainstormPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm text-gray-900 dark:text-white">{req.author}</span>
+                        <span className="font-medium text-sm text-gray-900">{req.author}</span>
                         <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${typeInfo.color}`}>
                           {typeInfo.label}
                         </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {new Date(req.createdAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{req.content}</p>
+                      <p className="text-sm text-gray-600 whitespace-pre-wrap">{req.content}</p>
                     </div>
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export default function BrainstormPage() {
 
       {/* 添加需求表单 */}
       {isActive && (
-        <form onSubmit={handleSubmit} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
+        <form onSubmit={handleSubmit} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
           <div className="mb-3">
             <input
               type="text"
@@ -319,7 +319,7 @@ export default function BrainstormPage() {
               onChange={(e) => handleAuthorChange(e.target.value)}
               placeholder="你的昵称"
               required
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
             />
           </div>
           <div className="mb-3">
@@ -332,7 +332,7 @@ export default function BrainstormPage() {
                   className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                     type === t
                       ? TYPE_LABELS[t].color
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   }`}
                 >
                   {TYPE_LABELS[t].label}
@@ -347,7 +347,7 @@ export default function BrainstormPage() {
               placeholder="写下你的需求、反馈或建议..."
               required
               rows={3}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none"
             />
           </div>
           <div className="flex justify-end">

@@ -70,21 +70,21 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
               rel={idea.sourceUrl ? 'noopener noreferrer' : undefined}
               className="block"
             >
-              <h3 className="text-[15px] font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition leading-snug">
+              <h3 className="text-[15px] font-medium text-gray-900 hover:text-blue-600-400 transition leading-snug">
                 {idea.title}
               </h3>
             </a>
 
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+            <p className="mt-1 text-sm text-gray-500 line-clamp-2 leading-relaxed">
               {idea.description}
             </p>
 
-            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${meta.bgClass} ${meta.textClass}`}>
                 {meta.label}
               </span>
               {idea.author && (
-                <span className="text-blue-500 dark:text-blue-400">by {idea.author}</span>
+                <span className="text-blue-500">by {idea.author}</span>
               )}
               <span>{formatTime(idea.publishedAt)}</span>
               {idea.heat > 0 && (
@@ -101,7 +101,7 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
           <div className="flex flex-col items-end gap-2 shrink-0">
             <button
               onClick={handleGenerate}
-              className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              className="px-3 py-1.5 text-xs font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
             >
               生成点子
             </button>
@@ -110,14 +110,14 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
               productCount === 1 ? (
                 <a
                   href={`/product/${firstProduct.id}`}
-                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                  className="text-xs text-gray-500 hover:text-gray-900 transition"
                 >
                   {firstProduct.name}
                 </a>
               ) : (
                 <a
                   href={`/idea/${idea.id}/products`}
-                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                  className="text-xs text-gray-500 hover:text-gray-900 transition"
                 >
                   {productCount} 个方案
                 </a>

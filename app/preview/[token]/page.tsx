@@ -77,25 +77,25 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
   if (done) {
     return (
       <div className="py-20 text-center max-w-lg mx-auto">
-        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
           <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">产品已生成</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">产品已生成</h1>
+        <p className="text-gray-500 mb-6">
           「{ideaTitle}」的产品方案已生成完成
         </p>
         <div className="flex gap-3 justify-center">
           <a
             href={`/product/${productId}`}
-            className="px-6 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+            className="px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition"
           >
             查看产品方案
           </a>
           <a
             href="/"
-            className="px-6 py-2.5 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
+            className="px-6 py-2.5 text-sm text-gray-500 hover:text-gray-900 transition"
           >
             返回首页
           </a>
@@ -108,14 +108,14 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
     return (
       <div className="py-20 text-center max-w-lg mx-auto">
         <div className="relative inline-flex items-center justify-center mb-6">
-          <div className="w-16 h-16 rounded-full border-4 border-gray-100 dark:border-gray-800" />
-          <div className="absolute w-16 h-16 rounded-full border-4 border-transparent border-t-gray-900 dark:border-t-white animate-spin" />
+          <div className="w-16 h-16 rounded-full border-4 border-gray-100" />
+          <div className="absolute w-16 h-16 rounded-full border-4 border-transparent border-t-gray-900 animate-spin" />
         </div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">正在生成产品</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{stage}</p>
-        <div className="max-w-xs mx-auto h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+        <h1 className="text-xl font-bold text-gray-900 mb-2">正在生成产品</h1>
+        <p className="text-gray-500 mb-4">{stage}</p>
+        <div className="max-w-xs mx-auto h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
           <div
-            className="h-full rounded-full bg-gray-900 dark:bg-white transition-all duration-500"
+            className="h-full rounded-full bg-gray-900 transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -129,14 +129,14 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
   return (
     <div className="py-8 max-w-lg mx-auto">
       <div className="mb-6">
-        <p className="text-sm text-gray-400 dark:text-gray-500 mb-2">产品预览</p>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{ideaTitle}</h1>
-        <p className="text-gray-500 dark:text-gray-400 leading-relaxed">{description}</p>
+        <p className="text-sm text-gray-400 mb-2">产品预览</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{ideaTitle}</h1>
+        <p className="text-gray-500 leading-relaxed">{description}</p>
       </div>
 
-      <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl mb-6">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">确认后将生成：</h3>
-        <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+      <div className="p-4 bg-gray-50 rounded-xl mb-6">
+        <h3 className="text-sm font-medium text-gray-700 mb-2">确认后将生成：</h3>
+        <ul className="text-sm text-gray-500 space-y-1">
           <li>• 产品方案（问题分析、解决方案、核心功能）</li>
           <li>• 可运行的 HTML 产品原型</li>
           <li>• 技术栈建议和商业模式</li>
@@ -146,13 +146,13 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
       <div className="flex gap-3">
         <button
           onClick={handleConfirm}
-          className="flex-1 px-6 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+          className="flex-1 px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition"
         >
           确认生成
         </button>
         <a
           href="/"
-          className="px-6 py-2.5 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition"
+          className="px-6 py-2.5 text-sm text-gray-500 hover:text-gray-900 transition"
         >
           取消
         </a>

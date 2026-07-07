@@ -156,7 +156,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-gray-300"></div>
       </div>
     )
   }
@@ -165,49 +165,49 @@ export default function HomePage() {
     <>
       {showSubmit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowSubmit(false)}>
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">发布需求</h2>
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">发布需求</h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">昵称</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">昵称</label>
                 <input
                   value={author}
                   onChange={e => setAuthor(e.target.value)}
                   placeholder="你的昵称"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">需求标题</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">需求标题</label>
                 <input
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="例如：需要一个 AI 写周报的工具"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">详细描述</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">详细描述</label>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   placeholder="描述你的需求场景、痛点..."
                   rows={3}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-300 resize-none"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-300 resize-none"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setShowSubmit(false)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 transition"
+                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition"
               >
                 取消
               </button>
               <button
                 onClick={handleSubmitIdea}
                 disabled={!title.trim() || !author.trim() || submitting}
-                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
               >
                 {submitting ? '发布中...' : '发布'}
               </button>

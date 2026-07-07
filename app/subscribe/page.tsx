@@ -54,17 +54,17 @@ export default function SubscribePage() {
   if (success) {
     return (
       <div className="max-w-lg mx-auto py-16 text-center">
-        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-          <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
+          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">订阅成功</h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">订阅成功</h1>
+        <p className="text-gray-500 mb-6">
           我们会在每天早上 9 点为你收集最新资讯，<br />
           有新的产品想法会发送到你的邮箱。
         </p>
-        <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition">
+        <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 transition">
           返回首页
         </Link>
       </div>
@@ -74,8 +74,8 @@ export default function SubscribePage() {
   return (
     <div className="max-w-lg mx-auto py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">订阅每日资讯</h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">订阅每日资讯</h1>
+        <p className="text-gray-500">
           选择你感兴趣的主题，我们会每天为你收集最新资讯，<br />
           生成产品想法发送到你的邮箱。
         </p>
@@ -83,7 +83,7 @@ export default function SubscribePage() {
 
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             邮箱地址
           </label>
           <input
@@ -92,12 +92,12 @@ export default function SubscribePage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
             required
-            className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
+            className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             感兴趣的主题
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -108,15 +108,15 @@ export default function SubscribePage() {
                 onClick={() => toggleTopic(topic.id)}
                 className={`p-3 rounded-lg border text-left transition ${
                   selectedTopics.includes(topic.id)
-                    ? 'border-gray-900 dark:border-white bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    ? 'border-gray-900 bg-gray-900 text-white'
+                    : 'border-gray-200 hover:border-gray-300:border-gray-600'
                 }`}
               >
                 <div className="text-sm font-medium">{topic.name}</div>
                 <div className={`text-xs mt-0.5 ${
                   selectedTopics.includes(topic.id)
-                    ? 'text-gray-300 dark:text-gray-600'
-                    : 'text-gray-400 dark:text-gray-500'
+                    ? 'text-gray-300'
+                    : 'text-gray-400'
                 }`}>
                   {topic.desc}
                 </div>
@@ -132,13 +132,13 @@ export default function SubscribePage() {
         <button
           type="submit"
           disabled={!email.trim() || selectedTopics.length === 0 || submitting}
-          className="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {submitting ? '订阅中...' : '订阅'}
         </button>
       </form>
 
-      <p className="mt-6 text-xs text-gray-400 dark:text-gray-500 text-center">
+      <p className="mt-6 text-xs text-gray-400 text-center">
         每天早上 9 点发送，随时可取消订阅
       </p>
     </div>

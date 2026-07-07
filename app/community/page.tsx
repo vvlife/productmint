@@ -68,8 +68,8 @@ export default function CommunityPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
-        <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">加载中...</p>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
+        <p className="mt-4 text-sm text-gray-400">加载中...</p>
       </div>
     )
   }
@@ -77,15 +77,15 @@ export default function CommunityPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">社区作品</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">用户生成的产品，投票支持你喜欢的</p>
+        <h1 className="text-2xl font-bold text-gray-900">社区作品</h1>
+        <p className="mt-1 text-sm text-gray-500">用户生成的产品，投票支持你喜欢的</p>
       </div>
 
       {products.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="text-gray-500 dark:text-gray-400 mb-2">还没有作品</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
-            <Link href="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition">去首页</Link> 生成第一个产品
+          <p className="text-gray-500 mb-2">还没有作品</p>
+          <p className="text-sm text-gray-400">
+            <Link href="/" className="hover:text-gray-600-300 transition">去首页</Link> 生成第一个产品
           </p>
         </div>
       ) : (
@@ -95,12 +95,12 @@ export default function CommunityPage() {
             return (
               <div
                 key={product.id}
-                className="flex items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 transition"
+                className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200:border-gray-700 transition"
               >
                 {/* 排名 */}
                 <div className="shrink-0 w-10 text-center">
                   <span className={`text-lg font-bold ${
-                    product.rank <= 3 ? 'text-amber-500' : 'text-gray-400 dark:text-gray-500'
+                    product.rank <= 3 ? 'text-amber-500' : 'text-gray-400'
                   }`}>
                     {product.rank}
                   </span>
@@ -112,8 +112,8 @@ export default function CommunityPage() {
                   disabled={votingId === product.id}
                   className={`shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition ${
                     hasVoted
-                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                      : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   <svg className={`w-5 h-5 ${votingId === product.id ? 'animate-pulse' : ''}`} fill={hasVoted ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -128,14 +128,14 @@ export default function CommunityPage() {
                     href={`/product/${product.id}/app`}
                     className="block hover:opacity-80 transition"
                   >
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                    <h3 className="text-base font-semibold text-gray-900 truncate">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                    <p className="text-sm text-gray-500 truncate mt-0.5">
                       {product.tagline}
                     </p>
                   </Link>
-                  <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                  <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-400">
                     <span>基于「{product.ideaTitle.slice(0, 20)}」</span>
                     <span>·</span>
                     <span>{new Date(product.createdAt).toLocaleDateString('zh-CN')}</span>
@@ -145,7 +145,7 @@ export default function CommunityPage() {
                 {/* 预览链接 */}
                 <Link
                   href={`/product/${product.id}/app`}
-                  className="shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                  className="shrink-0 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
                 >
                   预览 →
                 </Link>

@@ -24,22 +24,22 @@ export default function CollectionCard({ collection }: { collection: any }) {
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-600">
               {count}条
             </span>
-            <h3 className="text-[15px] font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
+            <h3 className="text-[15px] font-medium text-gray-900 group-hover:text-blue-600:text-blue-400 transition leading-snug">
               {collection.title}
             </h3>
           </div>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
             {collection.summary}
           </p>
-          <div className="mt-2 flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+          <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
             <span>{formatTime(collection.createdAt)}</span>
           </div>
         </div>
         <svg
-          className="w-4 h-4 text-gray-300 dark:text-gray-600 mt-1 shrink-0 group-hover:text-gray-500 transition"
+          className="w-4 h-4 text-gray-300 mt-1 shrink-0 group-hover:text-gray-500 transition"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

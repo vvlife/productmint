@@ -41,7 +41,7 @@ export default function SearchBar({ initialQuery = '', autoFocus = false }: Prop
           onChange={(e) => setQuery(e.target.value)}
           autoFocus={autoFocus}
           placeholder="搜索需求关键词..."
-          className="w-full pl-11 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+          className="w-full pl-11 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
         />
       </div>
     </form>

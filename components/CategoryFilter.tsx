@@ -19,8 +19,8 @@ export default function CategoryFilter({ selected, onSelect }: Props) {
           onClick={() => onSelect(cat)}
           className={`shrink-0 px-3 py-1 text-xs rounded-full transition ${
             selected === cat
-              ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-gray-900 text-white font-medium'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
           {cat === 'all' ? '全部' : cat}

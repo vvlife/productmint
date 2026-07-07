@@ -280,20 +280,20 @@ export default function AnalysisModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+            <h2 className="text-lg font-semibold text-gray-900 truncate">
               需求分析
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+            <p className="text-sm text-gray-500 truncate">
               {idea.title}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -306,7 +306,7 @@ export default function AnalysisModal({
           {/* 已有产品 */}
           {!loadingProducts && existingProducts.length > 0 && step !== 'result' && step !== 'analyzing' && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">
                 已生成的产品方案 ({existingProducts.length})
               </h3>
               <div className="space-y-2">
@@ -315,19 +315,19 @@ export default function AnalysisModal({
                     key={p.id}
                     href={`/product/${p.id}`}
                     onClick={onClose}
-                    className="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition"
+                    className="block p-3 rounded-lg border border-gray-200 hover:border-blue-300:border-blue-700 transition"
                   >
-                    <div className="font-medium text-sm text-gray-900 dark:text-white">
+                    <div className="font-medium text-sm text-gray-900">
                       {p.name}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       {p.tagline}
                     </div>
                   </Link>
                 ))}
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500 mb-3">
                   想要生成新的产品方案？
                 </p>
               </div>
@@ -338,16 +338,16 @@ export default function AnalysisModal({
           {step === 'saved' && (
             <div className="text-center py-12">
               <div className="text-5xl mb-4">✅</div>
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-gray-900 mb-2">
                 产品方案已保存
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-500 mb-6">
                 可运行产品页面生成未完成，但你可以先查看方案详情。
               </p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
                 >
                   关闭
                 </button>
@@ -366,22 +366,22 @@ export default function AnalysisModal({
           {step === 'generating' && genInfo.state === 'generating' && (
             <div className="text-center py-12">
               <div className="relative inline-flex items-center justify-center mb-5">
-                <div className="w-12 h-12 rounded-full border-4 border-gray-100 dark:border-gray-800" />
-                <div className="absolute w-12 h-12 rounded-full border-4 border-transparent border-t-gray-900 dark:border-t-white animate-spin" />
+                <div className="w-12 h-12 rounded-full border-4 border-gray-100" />
+                <div className="absolute w-12 h-12 rounded-full border-4 border-transparent border-t-gray-900 animate-spin" />
               </div>
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-gray-900 mb-2">
                 正在生成产品页面
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5" id="gen-status">
+              <p className="text-sm text-gray-500 mb-5" id="gen-status">
                 {genInfo.stage}
               </p>
-              <div className="max-w-sm mx-auto h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div className="max-w-sm mx-auto h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gray-900 dark:bg-white transition-all duration-700"
+                  className="h-full rounded-full bg-gray-900 transition-all duration-700"
                   style={{ width: `${Math.max(8, Math.min(100, genInfo.progress))}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
+              <p className="text-xs text-gray-400 mt-4">
                 页面在后台生成，你可以关闭此弹窗，完成后会通过站内信通知你
               </p>
             </div>
@@ -390,16 +390,16 @@ export default function AnalysisModal({
           {/* 生成失败 */}
           {step === 'generating' && genInfo.state === 'error' && (
             <div className="text-center py-12">
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-gray-900 mb-2">
                 产品页面生成失败
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-500 mb-6">
                 可运行页面未能生成，但你仍可查看产品方案。
               </p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
                 >
                   关闭
                 </button>
@@ -417,24 +417,24 @@ export default function AnalysisModal({
           {/* 生成完成 */}
           {step === 'generating' && genInfo.state === 'done' && (
             <div className="text-center py-12">
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-gray-900 mb-2">
                 产品页面已生成
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-500 mb-6">
                 可运行的产品页面已经准备好，点击即可试用。
               </p>
               <div className="flex gap-3 justify-center">
                 <Link
                   href={`/product/${savedProduct?.id}`}
                   onClick={onClose}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
                 >
                   查看方案
                 </Link>
                 <Link
                   href={`/product/${savedProduct?.id}/app`}
                   onClick={onClose}
-                  className="px-6 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+                  className="px-6 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition"
                 >
                   查看产品页面
                 </Link>
@@ -445,15 +445,15 @@ export default function AnalysisModal({
           {/* 初始状态 */}
           {step === 'idle' && (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-300 mb-2">
+              <p className="text-gray-600 mb-2">
                 分析这个需求并生成产品方案
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 分析用户痛点，设计核心功能、技术栈、商业模式等
               </p>
               <button
                 onClick={handleAnalyze}
-                className="px-6 py-2.5 bg-gray-900 dark:bg-white dark:text-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+                className="px-6 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition"
               >
                 开始分析
               </button>
@@ -467,10 +467,10 @@ export default function AnalysisModal({
           {step === 'analyzing' && (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500 mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-600">
                 AI 正在分析需求...
               </p>
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 深入挖掘痛点，设计解决方案
               </p>
             </div>
@@ -480,11 +480,11 @@ export default function AnalysisModal({
           {step === 'result' && analysis && (
             <div className="space-y-4">
               {/* 产品名称 */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-4">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4">
+                <h3 className="text-xl font-bold text-gray-900">
                   {analysis.name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   {analysis.tagline}
                 </p>
               </div>
@@ -495,12 +495,12 @@ export default function AnalysisModal({
 
               {coreFeatures.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
                     ⚡ 核心功能
                   </h4>
                     <div className="flex flex-wrap gap-2">
                     {coreFeatures.map((f, i) => (
-                      <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                      <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-blue-50 text-blue-600">
                         {f}
                       </span>
                     ))}
@@ -510,12 +510,12 @@ export default function AnalysisModal({
 
               {techStack.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
                     🛠 推荐技术栈
                   </h4>
                     <div className="flex flex-wrap gap-2">
                     {techStack.map((t, i) => (
-                      <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                      <span key={i} className="px-2.5 py-1 text-xs rounded-full bg-gray-100 text-gray-600">
                         {t}
                       </span>
                     ))}
@@ -537,17 +537,17 @@ export default function AnalysisModal({
 
         {/* Footer */}
         {(step === 'result' || step === 'saving') && analysis && (
-          <div className="flex items-center justify-between gap-3 p-5 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between gap-3 p-5 border-t border-gray-100">
             <button
               onClick={() => setStep('idle')}
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
             >
               ← 重新分析
             </button>
             <div className="flex gap-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
               >
                 取消
               </button>
@@ -598,10 +598,10 @@ function Section({ title, content }: { title: string; content?: unknown }) {
   if (!text) return null
   return (
     <div>
-      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+      <h4 className="text-sm font-semibold text-gray-700 mb-1.5">
         {title}
       </h4>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+      <p className="text-sm text-gray-600 leading-relaxed">
         {text}
       </p>
     </div>

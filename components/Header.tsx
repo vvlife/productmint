@@ -90,8 +90,8 @@ export default function Header() {
     <>
       {/* 移动端搜索弹窗 */}
       {showMobileSearch && (
-        <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 sm:hidden">
-          <div className="flex items-center gap-2 p-3 border-b border-gray-200 dark:border-gray-700">
+        <div className="fixed inset-0 z-50 bg-white sm:hidden">
+          <div className="flex items-center gap-2 p-3 border-b border-gray-200">
             <button
               onClick={() => setShowMobileSearch(false)}
               className="p-2 text-gray-500"
@@ -107,12 +107,12 @@ export default function Header() {
                 onChange={(e) => setMobileQuery(e.target.value)}
                 placeholder="搜索..."
                 autoFocus
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none"
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={!mobileQuery.trim()}
-                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg disabled:opacity-40"
+                className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg disabled:opacity-40"
               >
                 搜索
               </button>
@@ -121,25 +121,25 @@ export default function Header() {
         </div>
       )}
 
-      <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-3xl px-4">
           <div className="flex items-center justify-between h-14 gap-3">
-            <Link href="/" className="flex items-center gap-1.5 shrink-0 font-semibold text-gray-900 dark:text-white">
+            <Link href="/" className="flex items-center gap-1.5 shrink-0 font-semibold text-gray-900">
               Idea<span className="text-blue-600">Hub</span>
             </Link>
 
             <button
               onClick={handlePublish}
-              className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0"
+              className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition shrink-0"
             >
               发布
             </button>
 
-            <Link href="/community" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0">
+            <Link href="/community" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition shrink-0">
               社区
             </Link>
 
-            <Link href="/subscribe" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition shrink-0">
+            <Link href="/subscribe" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition shrink-0">
               订阅
             </Link>
 
@@ -150,12 +150,12 @@ export default function Header() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="搜索..."
-                className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
+                className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 transition"
               />
               <button
                 type="submit"
                 disabled={!query.trim()}
-                className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 搜索
               </button>
@@ -164,7 +164,7 @@ export default function Header() {
             {/* 移动端搜索按钮 */}
             <button
               onClick={() => setShowMobileSearch(true)}
-              className="sm:hidden p-2 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+              className="sm:hidden p-2 text-gray-500 hover:text-gray-900"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -178,12 +178,12 @@ export default function Header() {
               disabled={refreshState === 'loading'}
               className={`px-3 py-1.5 text-sm rounded-lg transition shrink-0 ${
                 refreshState === 'loading'
-                  ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 cursor-wait'
+                  ? 'text-blue-600 bg-blue-50 cursor-wait'
                   : refreshState === 'success'
-                  ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                  ? 'text-green-600 bg-green-50'
                   : refreshState === 'error'
-                  ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  ? 'text-red-600 bg-red-50'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               <span className="hidden sm:inline">{buttonLabel}</span>

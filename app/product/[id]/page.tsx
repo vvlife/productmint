@@ -108,7 +108,7 @@ export default function ProductPage() {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 dark:border-gray-600"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
       </div>
     )
   }
@@ -117,7 +117,7 @@ export default function ProductPage() {
     return (
       <div className="py-20 text-center">
         <p className="text-4xl mb-4">📦</p>
-        <p className="text-gray-500 dark:text-gray-400 mb-2">产品不存在</p>
+        <p className="text-gray-500 mb-2">产品不存在</p>
         <Link href="/" className="text-blue-500 hover:underline text-sm">
           返回首页
         </Link>
@@ -127,7 +127,7 @@ export default function ProductPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition">
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 mb-6 transition">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -135,16 +135,16 @@ export default function ProductPage() {
       </Link>
 
       {/* 产品头部 */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-2xl p-6 mb-6">
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-6 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-gray-900">
               {product.name}
             </h1>
-            <p className="text-base text-gray-600 dark:text-gray-300 mt-2">
+            <p className="text-base text-gray-600 mt-2">
               {product.tagline}
             </p>
-            <div className="mt-4 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+            <div className="mt-4 flex items-center gap-3 text-xs text-gray-400">
               <span>基于需求：{product.ideaTitle}</span>
               <span>·</span>
               <span>{new Date(product.createdAt).toLocaleString('zh-CN')}</span>
@@ -153,7 +153,7 @@ export default function ProductPage() {
           {product.generatedHtml ? (
             <Link
               href={`/product/${product.id}/app`}
-              className="shrink-0 px-5 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
+              className="shrink-0 px-5 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition"
             >
               查看产品页面
             </Link>
@@ -161,7 +161,7 @@ export default function ProductPage() {
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="shrink-0 px-5 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-50"
+              className="shrink-0 px-5 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-50"
             >
               {generating ? '生成中...' : '生成产品页面'}
             </button>
@@ -177,12 +177,12 @@ export default function ProductPage() {
 
         {product.coreFeatures.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
               ⚡ 核心功能
             </h2>
             <div className="flex flex-wrap gap-2">
               {product.coreFeatures.map((f, i) => (
-                <span key={i} className="px-3 py-1.5 text-sm rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                <span key={i} className="px-3 py-1.5 text-sm rounded-full bg-blue-50 text-blue-600">
                   {f}
                 </span>
               ))}
@@ -192,12 +192,12 @@ export default function ProductPage() {
 
         {product.techStack.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
               🛠 推荐技术栈
             </h2>
             <div className="flex flex-wrap gap-2">
               {product.techStack.map((t, i) => (
-                <span key={i} className="px-3 py-1.5 text-sm rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                <span key={i} className="px-3 py-1.5 text-sm rounded-full bg-gray-100 text-gray-600">
                   {t}
                 </span>
               ))}
@@ -216,14 +216,14 @@ export default function ProductPage() {
         <button
           onClick={handleStartBrainstorm}
           disabled={startingBrainstorm}
-          className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition disabled:opacity-50"
         >
           {startingBrainstorm ? '创建中...' : '💬 发起 Brainstorm'}
         </button>
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition disabled:opacity-50"
+          className="px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
         >
           {deleting ? '删除中...' : '删除'}
         </button>
@@ -232,7 +232,7 @@ export default function ProductPage() {
       {/* 历史 Brainstorm 会话 */}
       {brainstormSessions.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">
             Brainstorm 历史
           </h2>
           <div className="space-y-2">
@@ -240,17 +240,17 @@ export default function ProductPage() {
               <Link
                 key={session.id}
                 href={`/brainstorm/${session.id}`}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition"
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-indigo-300:border-indigo-700 transition"
               >
                 <div className="flex items-center gap-3">
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                     session.status === 'active'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
                   }`}>
                     {session.status === 'active' ? '进行中' : '已结束'}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <span className="text-sm text-gray-600">
                     {session.participants.length} 人参与 · {session.requirementCount} 条需求
                   </span>
                 </div>
@@ -270,10 +270,10 @@ function Section({ title, content }: { title: string; content?: string }) {
   if (!content) return null
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <h2 className="text-lg font-semibold text-gray-900 mb-2">
         {title}
       </h2>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
         {content}
       </p>
     </div>

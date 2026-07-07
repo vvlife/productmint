@@ -16,10 +16,10 @@ export default function Hero() {
 
   return (
     <div className="py-12 sm:py-20 text-center">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
         IdeaHub
       </h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
+      <p className="text-gray-500 mb-8 max-w-md mx-auto">
         从需求到产品，一键生成
       </p>
 
@@ -29,12 +29,12 @@ export default function Hero() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="搜索你感兴趣的方向..."
-          className="flex-1 px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 transition"
+          className="flex-1 px-4 py-2.5 text-sm rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-300:ring-gray-600 transition"
         />
         <button
           type="submit"
           disabled={!query.trim()}
-          className="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           搜索
         </button>
@@ -45,7 +45,7 @@ export default function Hero() {
           <a
             key={tag}
             href={`/search?q=${encodeURIComponent(tag)}`}
-            className="px-3 py-1 text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="px-3 py-1 text-sm text-gray-500 border border-gray-200 rounded-full hover:bg-gray-100 transition"
           >
             {tag}
           </a>

@@ -55,7 +55,7 @@ export default function SettingsPanel() {
   // 避免 hydration mismatch
   if (!mounted) {
     return (
-      <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+      <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 rounded-lg hover:bg-gray-100">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -69,7 +69,7 @@ export default function SettingsPanel() {
       {/* 设置按钮 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900-200 transition rounded-lg hover:bg-gray-100"
         title="设置"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,14 +89,14 @@ export default function SettingsPanel() {
           />
           
           {/* 面板 */}
-          <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 z-50 p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">
               设置
             </h3>
 
             {/* 语言选择 */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+              <label className="block text-xs font-medium text-gray-500 mb-2">
                 界面语言 / Language
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -106,8 +106,8 @@ export default function SettingsPanel() {
                     onClick={() => setLanguage(lang)}
                     className={`px-3 py-2 text-xs rounded-lg transition text-left ${
                       settings.language === lang
-                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
-                        : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     {LANGUAGE_NAMES[lang]}
@@ -119,13 +119,13 @@ export default function SettingsPanel() {
             {/* 自动翻译 */}
             <div className="mb-4">
               <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-700">
                   自动翻译内容
                 </span>
                 <button
                   onClick={() => setAutoTranslate(!settings.autoTranslate)}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
-                    settings.autoTranslate ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                    settings.autoTranslate ? 'bg-blue-500' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -135,7 +135,7 @@ export default function SettingsPanel() {
                   />
                 </button>
               </label>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 自动将外文内容翻译为所选语言
               </p>
             </div>
@@ -143,13 +143,13 @@ export default function SettingsPanel() {
             {/* 广告过滤 */}
             <div className="mb-2">
               <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-700">
                   过滤广告内容
                 </span>
                 <button
                   onClick={() => setFilterAds(!settings.filterAds)}
                   className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
-                    settings.filterAds ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                    settings.filterAds ? 'bg-blue-500' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -159,7 +159,7 @@ export default function SettingsPanel() {
                   />
                 </button>
               </label>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 自动过滤推广、营销类内容
               </p>
             </div>
@@ -167,7 +167,7 @@ export default function SettingsPanel() {
             {/* 关闭按钮 */}
             <button
               onClick={() => setIsOpen(false)}
-              className="w-full mt-4 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+              className="w-full mt-4 py-2 text-xs text-gray-500 hover:text-gray-700-200 transition"
             >
               关闭
             </button>
