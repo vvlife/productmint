@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Product, BrainstormSession } from '@/lib/types'
+import { addNotification } from '@/lib/notify'
 
 export default function ProductPage() {
   const params = useParams()
@@ -13,6 +14,10 @@ export default function ProductPage() {
   const [deleting, setDeleting] = useState(false)
   const [brainstormSessions, setBrainstormSessions] = useState<BrainstormSession[]>([])
   const [startingBrainstorm, setStartingBrainstorm] = useState(false)
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle')
+  const [submitResult, setSubmitResult] = useState<{ id?: number; message?: string } | null>(null)
+  const [showEmailInput, setShowEmailInput] = useState(false)
+  const [email, setEmail] = useState('')
 
   useEffect(() => {
     const id = params.id as string
@@ -77,6 +82,41 @@ export default function ProductPage() {
       }
     } catch {} finally {
       setStartingBrainstorm(false)
+    }
+  }
+
+  const handleSubmitLeaderboard = async () => {
+    if (!product || submitState === 'submitting') return
+    if (!showEmailInput) {
+      setShowEmailInput(true)
+      return
+    }
+    if (!email.trim() || !email.includes('@')) return
+
+    setSubmitState('submitting')
+    try {
+      const resp = await fetch('/api/submit-leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id, email: email.trim() }),
+      })
+      const data = await resp.json()
+      if (data.success) {
+        setSubmitState('done')
+        setSubmitResult({ id: data.id, message: data.message })
+        addNotification({
+          title: '打榜提交成功',
+          body: `「${product.name}」已提交到 AICPB (ID: ${data.id})`,
+          href: `https://www.aicpb.com`,
+          type: 'done',
+        })
+      } else {
+        setSubmitState('error')
+        setSubmitResult({ message: data.error || '提交失败' })
+      }
+    } catch {
+      setSubmitState('error')
+      setSubmitResult({ message: '网络错误' })
     }
   }
 
@@ -188,6 +228,13 @@ export default function ProductPage() {
           {startingBrainstorm ? '创建中...' : '💬 发起 Brainstorm'}
         </button>
         <button
+          onClick={handleSubmitLeaderboard}
+          disabled={submitState === 'submitting'}
+          className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg hover:opacity-90 transition shadow-sm disabled:opacity-50"
+        >
+          {submitState === 'submitting' ? '提交中...' : submitState === 'done' ? '✅ 已提交' : '🏆 打榜'}
+        </button>
+        <button
           onClick={handleDelete}
           disabled={deleting}
           className="px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition disabled:opacity-50"
@@ -195,6 +242,46 @@ export default function ProductPage() {
           {deleting ? '删除中...' : '删除'}
         </button>
       </div>
+
+      {/* 打榜邮箱输入 */}
+      {showEmailInput && submitState !== 'done' && (
+        <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+          <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
+            提交到 AICPB 需要联系邮箱（用于审核通知）
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="flex-1 px-3 py-2 text-sm rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+            <button
+              onClick={handleSubmitLeaderboard}
+              disabled={submitState === 'submitting' || !email.includes('@')}
+              className="px-4 py-2 text-sm font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition disabled:opacity-50"
+            >
+              确认提交
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 打榜结果 */}
+      {submitResult && (
+        <div className={`mt-3 p-3 rounded-lg text-sm ${
+          submitState === 'done'
+            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+        }`}>
+          {submitState === 'done' ? (
+            <span>✅ 提交成功！AICPB ID: {submitResult.id} — {submitResult.message}</span>
+          ) : (
+            <span>❌ {submitResult.message}</span>
+          )}
+        </div>
+      )}
 
       {/* 历史 Brainstorm 会话 */}
       {brainstormSessions.length > 0 && (
