@@ -84,6 +84,13 @@ export default function HomePage() {
     return () => window.removeEventListener('ideahub:crawl-complete', handleCrawlComplete as EventListener)
   }, [])
 
+  // 监听 Header 发布需求按钮
+  useEffect(() => {
+    const handleShowSubmit = () => setShowSubmit(true)
+    window.addEventListener('ideahub:show-submit', handleShowSubmit)
+    return () => window.removeEventListener('ideahub:show-submit', handleShowSubmit)
+  }, [])
+
   const handleSubmitIdea = async () => {
     if (!title.trim() || !author.trim() || submitting) return
     setSubmitting(true)
@@ -118,21 +125,6 @@ export default function HomePage() {
 
   return (
     <>
-      {/* 发布需求按钮 */}
-      <div className="mb-4 flex items-center justify-between">
-        {lastCrawlAt && (
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            上次抓取：{new Date(lastCrawlAt).toLocaleString('zh-CN')}
-          </p>
-        )}
-        <button
-          onClick={() => setShowSubmit(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg hover:opacity-90 transition shadow-sm"
-        >
-          ✏️ 发布需求
-        </button>
-      </div>
-
       {/* 发布需求弹窗 */}
       {showSubmit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowSubmit(false)}>

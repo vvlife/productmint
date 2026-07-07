@@ -35,12 +35,23 @@ export default function BrainstormPage() {
       const resp = await fetch(`/api/brainstorm/${sessionId}`, { cache: 'no-store' })
       if (resp.ok) {
         const data = await resp.json()
-        setSession(data.session)
-        setRequirements(data.requirements || [])
+        if (data.session) {
+          setSession(data.session)
+          setRequirements(data.requirements || [])
+          setLoading(false)
+          return
+        }
       }
-    } catch {} finally {
-      setLoading(false)
-    }
+    } catch {}
+
+    // fallback: 从 localStorage 读取 session 数据
+    try {
+      const allSessions = JSON.parse(localStorage.getItem('brainstorm_sessions') || '{}')
+      if (allSessions[sessionId]) {
+        setSession(allSessions[sessionId])
+      }
+    } catch {}
+    setLoading(false)
   }, [sessionId])
 
   useEffect(() => {

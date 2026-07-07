@@ -41,9 +41,9 @@ export default function ProductAppPage() {
     loadProduct()
   }, [loadProduct])
 
-  // 当前展示的版本 HTML
-  const versions = product?.versions || []
-  const currentVersion = product?.currentVersion || (versions.length ? versions[versions.length - 1].version : 1)
+  // 当前展示的版本 HTML（默认最新版本）
+  const versions = (product?.versions || []).slice().sort((a, b) => b.version - a.version)
+  const currentVersion = product?.currentVersion || (versions.length ? versions[0].version : 1)
   const activeHtml = product
     ? (versions.find(v => v.version === currentVersion)?.html || product.generatedHtml || '')
     : ''
@@ -96,6 +96,43 @@ export default function ProductAppPage() {
     } catch (e) {
       setDeployState('error')
       setDeployError(e instanceof Error ? e.message : '部署失败')
+    }
+  }
+
+  // 打榜提交
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle')
+  const [showEmailInput, setShowEmailInput] = useState(false)
+  const [email, setEmail] = useState('')
+
+  const handleSubmitLeaderboard = async () => {
+    if (!product || submitState === 'submitting') return
+    if (!showEmailInput) {
+      setShowEmailInput(true)
+      return
+    }
+    if (!email.trim() || !email.includes('@')) return
+
+    setSubmitState('submitting')
+    try {
+      const resp = await fetch('/api/submit-leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId: product.id, email: email.trim() }),
+      })
+      const data = await resp.json()
+      if (data.success) {
+        setSubmitState('done')
+        addNotification({
+          title: '打榜提交成功',
+          body: `「${product.name}」已提交到 AICPB (ID: ${data.id})`,
+          href: 'https://www.aicpb.com',
+          type: 'done',
+        })
+      } else {
+        setSubmitState('error')
+      }
+    } catch {
+      setSubmitState('error')
     }
   }
 
@@ -257,8 +294,46 @@ export default function ProductAppPage() {
             </svg>
             调整
           </button>
+
+          {/* 打榜按钮 */}
+          <button
+            onClick={handleSubmitLeaderboard}
+            disabled={submitState === 'submitting'}
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-amber-500 to-orange-500 rounded-full hover:opacity-90 transition shadow-sm disabled:opacity-50"
+          >
+            {submitState === 'done' ? '✅' : '🏆'} {submitState === 'submitting' ? '提交中...' : submitState === 'done' ? '已提交' : '打榜'}
+          </button>
         </div>
       </div>
+
+      {/* 打榜邮箱输入 */}
+      {showEmailInput && submitState !== 'done' && (
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-amber-50 dark:bg-amber-900/20 shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-amber-700 dark:text-amber-300">邮箱：</span>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="flex-1 max-w-xs px-2 py-1 text-xs rounded border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+            <button
+              onClick={handleSubmitLeaderboard}
+              disabled={submitState === 'submitting' || !email.includes('@')}
+              className="px-3 py-1 text-xs font-medium text-white bg-amber-500 rounded hover:bg-amber-600 disabled:opacity-50"
+            >
+              提交到 AICPB
+            </button>
+            <button
+              onClick={() => setShowEmailInput(false)}
+              className="text-xs text-gray-400 hover:text-gray-600"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 调整输入区 */}
       {showAdjust && (

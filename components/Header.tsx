@@ -98,6 +98,16 @@ export default function Header() {
             </div>
           </form>
 
+          {/* 发布需求按钮 - 触发首页的发布弹窗 */}
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('ideahub:show-submit'))}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full hover:opacity-90 transition shadow-sm shrink-0"
+          >
+            ✏️ 发布
+          </button>
+
+          <Notifications />
+
           <button
             onClick={handleRefresh}
             disabled={refreshState === 'loading'}
@@ -114,8 +124,6 @@ export default function Header() {
             </svg>
             <span className="hidden sm:inline">{buttonLabel}</span>
           </button>
-
-          <Notifications />
         </div>
       </div>
     </header>
