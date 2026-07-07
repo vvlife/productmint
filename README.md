@@ -34,7 +34,9 @@
 
 发起 Brainstorm 会话，邀请同学一起讨论需求，结束后合并生成产品文档。
 
-![Brainstorm](public/screenshots/brainstorm.png)
+![Brainstorm 讨论列表](public/screenshots/brainstorm.png)
+
+![Brainstorm 添加需求](public/screenshots/brainstorm2.png)
 
 ---
 
