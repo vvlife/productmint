@@ -7,6 +7,7 @@ import Link from 'next/link'
 
 interface AnalysisModalProps {
   idea: Idea
+  autoStart?: boolean
   onClose: () => void
   onProductCreated: (product: Product) => void
 }
@@ -23,10 +24,11 @@ interface GenInfo {
 
 export default function AnalysisModal({
   idea,
+  autoStart = false,
   onClose,
   onProductCreated,
 }: AnalysisModalProps) {
-  const [step, setStep] = useState<Step>('idle')
+  const [step, setStep] = useState<Step>(autoStart ? 'analyzing' : 'idle')
   const [analysis, setAnalysis] = useState<Partial<Product> | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [existingProducts, setExistingProducts] = useState<Product[]>([])
@@ -54,6 +56,13 @@ export default function AnalysisModal({
     return () => {
       unsub()
       window.removeEventListener('ideahub:notification', sync)
+    }
+  }, [])
+
+  // autoStart: 直接开始分析
+  useEffect(() => {
+    if (autoStart && step === 'analyzing') {
+      handleAnalyze()
     }
   }, [])
 

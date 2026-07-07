@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { platformMeta } from '@/lib/data'
 import type { Idea, Product } from '@/lib/types'
 import AnalysisModal from './AnalysisModal'
-import Link from 'next/link'
 
 function formatTime(iso: string): string {
   const date = new Date(iso)
@@ -30,7 +29,6 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
   const [productCount, setProductCount] = useState(0)
   const [firstProduct, setFirstProduct] = useState<Product | null>(null)
 
-  // 从远程加载该 idea 的产品数
   useEffect(() => {
     let cancelled = false
     const loadProducts = async () => {
@@ -50,7 +48,7 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
     return () => { cancelled = true }
   }, [idea.id, showAnalysis])
 
-  const handleAnalyze = (e: React.MouseEvent) => {
+  const handleGenerate = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setShowAnalysis(true)
@@ -61,34 +59,25 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
     setFirstProduct(product)
   }
 
-  // 用户提交的需求点击后自动打开 AI 分析
-  const isUserIdea = idea.platform === 'other' || !!(idea as any).author
-
   return (
     <>
-      <div className="block py-4 group" onClick={isUserIdea ? handleAnalyze : undefined} style={isUserIdea ? { cursor: 'pointer' } : undefined}>
+      <div className="block py-4 group">
         <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
-            {isUserIdea ? (
+            <a
+              href={idea.sourceUrl || '#'}
+              target={idea.sourceUrl ? '_blank' : undefined}
+              rel={idea.sourceUrl ? 'noopener noreferrer' : undefined}
+            >
               <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
                 {idea.title}
               </h3>
-            ) : (
-              <a
-                href={idea.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition leading-snug">
-                  {idea.title}
-                </h3>
-              </a>
-            )}
-            
+            </a>
+
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
               {idea.description}
             </p>
-            
+
             <div className="mt-2 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${meta.bgClass} ${meta.textClass}`}>
                 {meta.label}
@@ -104,52 +93,46 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
                 {idea.heat}
               </span>
               <span className="hidden sm:inline">{idea.category}</span>
-              {isUserIdea && (
-                <span className="text-indigo-500 dark:text-indigo-400">点击查看 →</span>
-              )}
             </div>
           </div>
 
           {/* 右侧操作区 */}
           <div className="flex flex-col items-end gap-2 shrink-0">
-            {/* AI 分析按钮 */}
             <button
-              onClick={handleAnalyze}
+              onClick={handleGenerate}
               className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:opacity-90 transition shadow-sm"
-              title="使用 AI 分析需求并生成产品方案"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>AI 分析</span>
+              <span>生成点子</span>
             </button>
 
-            {/* 已有产品入口 */}
             {productCount > 0 && firstProduct && (
               productCount === 1 ? (
-                <Link
+                <a
                   href={`/product/${firstProduct.id}`}
                   className="text-xs text-green-600 dark:text-green-400 hover:underline"
                 >
                   → {firstProduct.name}
-                </Link>
+                </a>
               ) : (
-                <Link
+                <a
                   href={`/idea/${idea.id}/products`}
                   className="text-xs text-green-600 dark:text-green-400 hover:underline"
                 >
                   → {productCount} 个产品方案
-                </Link>
+                </a>
               )
             )}
           </div>
         </div>
       </div>
 
-      {/* 分析弹窗 */}
       {showAnalysis && (
         <AnalysisModal
           idea={idea}
+          autoStart
           onClose={() => setShowAnalysis(false)}
           onProductCreated={handleProductCreated}
         />
