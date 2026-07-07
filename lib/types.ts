@@ -99,6 +99,14 @@ export interface StorageData {
 
 // ── Product 类型 ───────────────────────────────────────────────
 
+export interface ProductVersion {
+  id: string
+  version: number         // 版本号，从 1 开始自增
+  html: string            // 该版本的自包含可运行 HTML
+  prompt?: string         // 生成/调整该版本时给出的要求（v1 为初始方案）
+  createdAt: string
+}
+
 export interface Product {
   id: string
   ideaId: string          // 关联的需求 ID
@@ -116,6 +124,11 @@ export interface Product {
   mvp: string             // MVP 方案
   createdAt: string       // 创建时间
   status: 'draft' | 'confirmed'
+  generatedHtml?: string  // 当前版本的可运行 HTML（兼容快照，等于 versions[currentVersion-1].html）
+  versions?: ProductVersion[]   // 版本历史
+  currentVersion?: number       // 当前展示的版本号
+  deployUrl?: string            // 部署到公网后的可访问链接（Vercel Blob）
+  deployedAt?: string           // 最近一次部署时间（ISO 字符串）
 }
 
 export interface ProductSummary {
@@ -124,4 +137,27 @@ export interface ProductSummary {
   tagline: string
   ideaTitle: string
   createdAt: string
+}
+
+// ── Brainstorm 类型 ────────────────────────────────────────────
+
+export interface BrainstormRequirement {
+  id: string
+  sessionId: string
+  author: string          // 参与者昵称
+  content: string         // 需求/反馈内容
+  type: 'requirement' | 'feedback' | 'suggestion'
+  createdAt: string
+}
+
+export interface BrainstormSession {
+  id: string
+  productId: string       // 关联的产品 ID
+  productTitle: string    // 产品名称（冗余，方便展示）
+  status: 'active' | 'closed'
+  participants: string[]  // 参与者昵称列表
+  requirementCount: number
+  mergedRequirements?: string  // 合并后的需求文本（关闭时生成）
+  createdAt: string
+  closedAt?: string
 }
