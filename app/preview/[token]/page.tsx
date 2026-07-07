@@ -17,8 +17,8 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
   // 解析 token
   let ideaData
   try {
-    // URL decode the token first, then base64 decode
-    const decoded = atob(decodeURIComponent(token))
+    // URL decode, base64 decode, then UTF-8 decode
+    const decoded = decodeURIComponent(escape(atob(decodeURIComponent(token))))
     ideaData = JSON.parse(decoded)
   } catch {
     return (
