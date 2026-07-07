@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic'
 
 const JSONBLOB_BASE = 'https://jsonblob.com/api/jsonBlob'
 const SUBSCRIPTION_BLOB_ID = process.env.SUBSCRIPTION_BLOB_ID || ''
-const IDEAS_BLOB_ID = process.env.JSONBLOB_ID || ''
 
 interface Subscription {
   id: string
@@ -78,14 +77,14 @@ async function savePendingIdeas(ideas: PendingIdea[]): Promise<boolean> {
   }
 }
 
-function generateApprovalToken(email: string, ideaId: string, ideaTitle: string): string {
-  return Buffer.from(JSON.stringify({ email, ideaId, ideaTitle })).toString('base64')
+function generatePreviewToken(email: string, ideaId: string, ideaTitle: string, description: string): string {
+  return Buffer.from(JSON.stringify({ email, ideaId, ideaTitle, description })).toString('base64')
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
   const RESEND_API_KEY = process.env.RESEND_API_KEY
   if (!RESEND_API_KEY) {
-    console.log('[email] No RESEND_API_KEY, skipping email')
+    console.log('[email] No RESEND_API_KEY, skipping')
     return
   }
 
@@ -125,67 +124,77 @@ export async function POST() {
   const pendingIdeas = await getPendingIdeas()
   let newIdeasCount = 0
 
+  // 每个用户只发一个想法
   for (const sub of subs) {
-    for (const topicId of sub.topics) {
-      try {
-        // 搜索该主题的最新资讯
-        const searchResults = await webSearch(`${topicId} 创业 产品 需求`, 5)
-
-        for (const result of searchResults) {
-          // 检查是否已存在
-          const exists = pendingIdeas.some(
-            pi => pi.email === sub.email && pi.title === result.title
-          )
-          if (exists) continue
-
-          const ideaId = `idea_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-          const newIdea: PendingIdea = {
-            id: ideaId,
-            email: sub.email,
-            title: result.title,
-            description: result.description,
-            topic: topicId,
-            createdAt: new Date().toISOString(),
-            status: 'pending',
-          }
-
-          pendingIdeas.push(newIdea)
-          newIdeasCount++
-
-          // 生成审批链接
-          const token = generateApprovalToken(sub.email, ideaId, result.title)
-          const approveUrl = `https://ideahub-pearl.vercel.app/api/approve?token=${token}`
-
-          // 发送邮件
-          await sendEmail(
-            sub.email,
-            `新想法：${result.title}`,
-            `
-              <h2>${result.title}</h2>
-              <p>${result.description}</p>
-              <hr>
-              <p>
-                <a href="${approveUrl}" style="display:inline-block;padding:10px 20px;background:#111;color:white;border-radius:8px;text-decoration:none;">
-                  批准并生成产品
-                </a>
-              </p>
-              <p style="color:#666;font-size:12px;">点击批准后，我们会自动生成产品方案并发送到你的邮箱。</p>
-            `
-          )
-        }
-      } catch (e) {
-        console.error(`[daily] Error processing topic ${topicId} for ${sub.email}:`, e)
-      }
+    // 检查是否已经有待处理的想法
+    const hasPending = pendingIdeas.some(
+      pi => pi.email === sub.email && pi.status === 'pending'
+    )
+    if (hasPending) {
+      console.log(`[daily] ${sub.email} already has pending idea, skipping`)
+      continue
     }
 
-    // 更新最后发送时间
-    sub.lastSentAt = new Date().toISOString()
+    // 随机选一个主题
+    const topicId = sub.topics[Math.floor(Math.random() * sub.topics.length)]
+
+    try {
+      // 搜索该主题的最新资讯
+      const searchResults = await webSearch(`${topicId} 创业 产品 需求`, 3)
+
+      if (searchResults.length === 0) continue
+
+      // 取第一个结果
+      const result = searchResults[0]
+
+      // 检查是否已存在
+      const exists = pendingIdeas.some(
+        pi => pi.email === sub.email && pi.title === result.title
+      )
+      if (exists) continue
+
+      const ideaId = `idea_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+      const newIdea: PendingIdea = {
+        id: ideaId,
+        email: sub.email,
+        title: result.title,
+        description: result.description,
+        topic: topicId,
+        createdAt: new Date().toISOString(),
+        status: 'pending',
+      }
+
+      pendingIdeas.push(newIdea)
+      newIdeasCount++
+
+      // 生成预览链接
+      const token = generatePreviewToken(sub.email, ideaId, result.title, result.description)
+      const previewUrl = `https://ideahub-pearl.vercel.app/preview/${token}`
+
+      // 发送邮件
+      await sendEmail(
+        sub.email,
+        `新想法：${result.title}`,
+        `
+          <div style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #111; margin-bottom: 12px;">${result.title}</h2>
+            <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">${result.description}</p>
+            <a href="${previewUrl}" style="display: inline-block; padding: 12px 24px; background: #111; color: white; border-radius: 8px; text-decoration: none; font-weight: bold;">
+              查看产品设计
+            </a>
+            <p style="color: #999; font-size: 12px; margin-top: 16px;">点击后可预览产品设计，确认后自动生成。</p>
+          </div>
+        `
+      )
+    } catch (e) {
+      console.error(`[daily] Error processing for ${sub.email}:`, e)
+    }
   }
 
   await savePendingIdeas(pendingIdeas)
   await saveSubscriptions(subs)
 
-  console.log(`[daily] Done. ${newIdeasCount} new ideas sent to ${subs.length} subscribers.`)
+  console.log(`[daily] Done. ${newIdeasCount} new ideas sent.`)
 
   return NextResponse.json({
     success: true,

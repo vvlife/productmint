@@ -121,7 +121,7 @@ export default function Header() {
         </div>
       )}
 
-      <header className="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="mx-auto max-w-3xl px-4">
           <div className="flex items-center justify-between h-14 gap-3">
             <Link href="/" className="flex items-center gap-1.5 shrink-0 font-semibold text-gray-900 dark:text-white">
