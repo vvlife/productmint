@@ -34,10 +34,7 @@ export default function Timeline({ ideas, collections }: Props) {
       ...filteredCollections.map(c => ({ type: 'collection' as const, data: c, sortTime: c.createdAt })),
     ]
     return items.sort((a, b) => {
-      const diff = new Date(b.sortTime).getTime() - new Date(a.sortTime).getTime()
-      if (diff !== 0) return diff
-      // 同一时间，idea 排在 collection 前面
-      return a.type === 'idea' ? -1 : 1
+      return new Date(b.sortTime).getTime() - new Date(a.sortTime).getTime()
     })
   }, [filteredIdeas, filteredCollections])
 
