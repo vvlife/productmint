@@ -15,6 +15,7 @@ interface StoreData {
   analysis: AnalysisRecord[]
   brainstormSessions: BrainstormSession[]
   brainstormRequirements: BrainstormRequirement[]
+  userIdeas: Idea[]
 }
 
 export interface AnalysisRecord {
@@ -42,9 +43,10 @@ async function readLocalStore(): Promise<StoreData> {
       analysis: data.analysis || [],
       brainstormSessions: data.brainstormSessions || [],
       brainstormRequirements: data.brainstormRequirements || [],
+      userIdeas: data.userIdeas || [],
     }
   } catch {
-    return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [] }
+    return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [], userIdeas: [] }
   }
 }
 
@@ -67,16 +69,17 @@ async function fetchStore(): Promise<StoreData> {
     const resp = await fetch(`${JSONBLOB_BASE}/${getBlobId()}`, {
       cache: 'no-store',
     })
-    if (!resp.ok) return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [] }
+    if (!resp.ok) return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [], userIdeas: [] }
     const data = await resp.json()
     return {
       products: data.products || [],
       analysis: data.analysis || [],
       brainstormSessions: data.brainstormSessions || [],
       brainstormRequirements: data.brainstormRequirements || [],
+      userIdeas: data.userIdeas || [],
     }
   } catch {
-    return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [] }
+    return { products: [], analysis: [], brainstormSessions: [], brainstormRequirements: [], userIdeas: [] }
   }
 }
 
@@ -278,5 +281,20 @@ export async function closeBrainstormSession(
   session.status = 'closed'
   session.closedAt = new Date().toISOString()
   session.mergedRequirements = mergedRequirements
+  return saveStore(store)
+}
+
+// ── 用户需求 CRUD ─────────────────────────────────────────────
+
+export async function getUserIdeas(): Promise<Idea[]> {
+  const store = await fetchStore()
+  return store.userIdeas || []
+}
+
+export async function addUserIdea(idea: Idea): Promise<boolean> {
+  const store = await fetchStore()
+  if (!store.userIdeas) store.userIdeas = []
+  store.userIdeas.unshift(idea)
+  if (store.userIdeas.length > 500) store.userIdeas.length = 500
   return saveStore(store)
 }
