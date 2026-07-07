@@ -9,7 +9,7 @@ const BLOB_ID = process.env.SUBSCRIPTION_BLOB_ID || ''
 interface Subscription {
   id: string
   email: string
-  topics: string[]
+  topic: string
   createdAt: string
   lastSentAt?: string
 }
@@ -47,13 +47,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, topics } = await req.json()
+    const { email, topic } = await req.json()
 
     if (!email?.trim()) {
       return NextResponse.json({ error: '邮箱不能为空' }, { status: 400 })
     }
-    if (!topics?.length) {
-      return NextResponse.json({ error: '请选择至少一个主题' }, { status: 400 })
+    if (!topic?.trim()) {
+      return NextResponse.json({ error: '请选择一个主题' }, { status: 400 })
     }
 
     // 验证邮箱格式
@@ -67,17 +67,17 @@ export async function POST(req: NextRequest) {
     // 检查是否已订阅
     const existing = subs.find(s => s.email === email)
     if (existing) {
-      // 更新主题
-      existing.topics = [...new Set([...existing.topics, ...topics])]
+      // 更新主题（只保留一个）
+      existing.topic = topic
       await saveSubscriptions(subs)
-      return NextResponse.json({ success: true, message: '订阅已更新' })
+      return NextResponse.json({ success: true, message: '订阅已更新', subscription: existing })
     }
 
-    // 创建新订阅
+    // 创建新订阅（每人一个邮箱一个主题）
     const newSub: Subscription = {
       id: `sub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       email: email.trim(),
-      topics,
+      topic: topic,
       createdAt: new Date().toISOString(),
     }
 

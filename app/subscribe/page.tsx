@@ -16,20 +16,18 @@ const TOPICS = [
 
 export default function SubscribePage() {
   const [email, setEmail] = useState('')
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([])
+  const [selectedTopic, setSelectedTopic] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  const toggleTopic = (id: string) => {
-    setSelectedTopics(prev =>
-      prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id]
-    )
+  const handleSelectTopic = (id: string) => {
+    setSelectedTopic(id)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim() || selectedTopics.length === 0) return
+    if (!email.trim() || !selectedTopic) return
 
     setSubmitting(true)
     setError('')
@@ -37,7 +35,7 @@ export default function SubscribePage() {
       const resp = await fetch('/api/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), topics: selectedTopics }),
+        body: JSON.stringify({ email: email.trim(), topic: selectedTopic }),
       })
       const data = await resp.json()
       if (data.success) {
@@ -105,16 +103,16 @@ export default function SubscribePage() {
               <button
                 key={topic.id}
                 type="button"
-                onClick={() => toggleTopic(topic.id)}
+                onClick={() => handleSelectTopic(topic.id)}
                 className={`p-3 rounded-lg border text-left transition ${
-                  selectedTopics.includes(topic.id)
+                  selectedTopic === topic.id
                     ? 'border-gray-900 bg-gray-900 text-white'
-                    : 'border-gray-200 hover:border-gray-300:border-gray-600'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 <div className="text-sm font-medium">{topic.name}</div>
                 <div className={`text-xs mt-0.5 ${
-                  selectedTopics.includes(topic.id)
+                  selectedTopic === topic.id
                     ? 'text-gray-300'
                     : 'text-gray-400'
                 }`}>
@@ -131,7 +129,7 @@ export default function SubscribePage() {
 
         <button
           type="submit"
-          disabled={!email.trim() || selectedTopics.length === 0 || submitting}
+          disabled={!email.trim() || !selectedTopic || submitting}
           className="w-full px-4 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {submitting ? '订阅中...' : '订阅'}

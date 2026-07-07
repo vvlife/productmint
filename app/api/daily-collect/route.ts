@@ -13,7 +13,7 @@ const AGNES_BASE_URL = 'https://apihub.agnes-ai.com/v1'
 interface Subscription {
   id: string
   email: string
-  topics: string[]
+  topic: string
   createdAt: string
   lastSentAt?: string
 }
@@ -159,10 +159,9 @@ export async function POST() {
   let newProductsCount = 0
   let emailsSent = 0
 
-  // 每个用户处理一个主题
+  // 每个用户处理其订阅的主题
   for (const sub of subs) {
-    // 随机选一个主题
-    const topicId = sub.topics[Math.floor(Math.random() * sub.topics.length)]
+    const topicId = sub.topic
 
     try {
       // 1. 搜索该主题的最新资讯
