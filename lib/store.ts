@@ -1,7 +1,7 @@
 import type { Idea, Collection, CrawlResponse, CrawlStats, FeedResponse } from './types'
 import { crawlAll } from './crawlers'
 import { clusterIdeas } from './cluster'
-import { isAgentlyAvailable, searchAgently } from './agently-client'
+import { isNewsbotAvailable, searchNews } from './newsbot-client'
 
 // ── In-memory cache (per serverless instance) ─────────────────
 let _ideas: Idea[] = []
@@ -100,29 +100,29 @@ export async function search(query: string) {
     })),
   ].sort((a: any, b: any) => (b.heat ?? 0) - (a.heat ?? 0))
 
-  // 2. Agently search (web search) if local results are sparse
-  if (localResults.length < 3 && (await isAgentlyAvailable())) {
+  // 2. NewsBot search (web search) if local results are sparse
+  if (localResults.length < 3 && (await isNewsbotAvailable())) {
     try {
-      const agentlyResult = await searchAgently(query, 8, 'w')
-      if (agentlyResult.success && agentlyResult.ideas) {
-        const agentlyIdeas = agentlyResult.ideas.map((item, idx) => ({
+      const newsbotResult = await searchNews(query, 10)
+      if (newsbotResult.success && newsbotResult.ideas) {
+        const newsbotIdeas = newsbotResult.ideas.map((item, idx) => ({
           type: 'idea' as const,
-          id: `agently_search_${Date.now()}_${idx}`,
+          id: `newsbot_search_${Date.now()}_${idx}`,
           title: item.title,
           description: item.description,
           platform: 'other' as const,
           sourceUrl: item.sourceUrl || '',
           publishedAt: item.publishedAt || new Date().toISOString(),
-          heat: 0,
-          category: '其他' as const,
+          heat: item.heat || 0,
+          category: (item.category || '其他') as any,
         }))
-        // Merge: local first, then Agently results (dedup by title)
+        // Merge: local first, then NewsBot results (dedup by title)
         const seenTitles = new Set(localResults.map((r: any) => r.title?.toLowerCase()))
-        const uniqueAgently = agentlyIdeas.filter(a => !seenTitles.has(a.title?.toLowerCase()))
-        localResults.push(...uniqueAgently)
+        const uniqueNewsbot = newsbotIdeas.filter(a => !seenTitles.has(a.title?.toLowerCase()))
+        localResults.push(...uniqueNewsbot)
       }
     } catch (e) {
-      console.error('Agently search failed:', e)
+      console.error('NewsBot search failed:', e)
     }
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { collectByTopic, isAgentlyAvailable } from '@/lib/agently-client'
+import { collectNews, isNewsbotAvailable } from '@/lib/newsbot-client'
 import type { Idea, Category } from '@/lib/types'
 
 export const runtime = 'nodejs'
@@ -13,16 +13,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 })
     }
 
-    // Check if Agently server is available
-    const available = await isAgentlyAvailable()
+    // Check if NewsBot server is available
+    const available = await isNewsbotAvailable()
     if (!available) {
       return NextResponse.json({
-        error: 'Agently server is not available. Start it with: python crawl-server/agently_server.py',
+        error: 'NewsBot server is not available. Start it with: python crawl-server/newsbot.py',
       }, { status: 503 })
     }
 
     // Collect by topic
-    const result = await collectByTopic(topic.trim(), 20)
+    const result = await collectNews([topic.trim()], 20)
 
     if (!result.success) {
       return NextResponse.json({
@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
       }, { status: 500 })
     }
 
-    // Convert to Idea format and add to store
+    // Convert to Idea format
     const validCategories: Category[] = ['AI工具', 'SaaS', '消费', '教育', '开发者工具', '设计', '出海', '其他']
     const ideas: Idea[] = result.ideas.map((item, idx) => ({
-      id: `agently_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`,
+      id: item.id || `newsbot_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`,
       title: item.title,
       description: item.description,
       platform: 'other' as const,
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      topic: result.topic,
+      topic,
       ideas,
       total: ideas.length,
       collected_at: result.collected_at,
@@ -60,11 +60,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const available = await isAgentlyAvailable()
+  const available = await isNewsbotAvailable()
   return NextResponse.json({
     available,
     message: available
-      ? 'Agently server is running'
-      : 'Agently server is not available. Start it with: python crawl-server/agently_server.py',
+      ? 'NewsBot server is running'
+      : 'NewsBot server is not available. Start it with: python crawl-server/newsbot.py',
   })
 }
