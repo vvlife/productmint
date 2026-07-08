@@ -133,6 +133,7 @@ export interface Product {
   deployedAt?: string           // 最近一次部署时间
   votes?: number                // 社区投票数
   votedBy?: string[]            // 投票用户列表（用于去重）
+  clonedFrom?: string           // 来源产品ID（复制/改编时使用）
 }
 
 export interface CommunityProduct extends ProductSummary {
