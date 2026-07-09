@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Agent } from 'undici'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+const agnesAgent = new Agent({
+  headersTimeout: 600000,
+  bodyTimeout: 600000,
+})
 
 const AGNES_API_KEY = process.env.AGNES_API_KEY || ''
 const AGNES_BASE_URL = 'https://apihub.agnes-ai.com/v1'
@@ -67,6 +73,8 @@ ${featuresText}
         ],
         temperature: 0.8,
       }),
+      // @ts-expect-error undici-specific option
+      dispatcher: agnesAgent,
     })
 
     if (!response.ok) {

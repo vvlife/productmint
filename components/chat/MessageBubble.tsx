@@ -8,6 +8,7 @@ import PreviewCard from './cards/PreviewCard'
 import ActionCard from './cards/ActionCard'
 import ProgressCard from './cards/ProgressCard'
 import CopyCard from './cards/CopyCard'
+import InputCard from './cards/InputCard'
 
 interface MessageBubbleProps {
   message: Message
@@ -26,6 +27,7 @@ export default function MessageBubble({ message, onAction }: MessageBubbleProps)
       case 'action': return <ActionCard key={index} actions={card.actions} onAction={onAction} />
       case 'progress': return <ProgressCard key={index} progress={card.progress} stage={card.stage} />
       case 'copy': return <CopyCard key={index} data={card.data} onAction={onAction} />
+      case 'input': return <InputCard key={index} placeholder={card.placeholder} label={card.label} inputType={card.inputType} onSubmit={(val) => onAction?.(val, { type: 'input_card', value: val })} />
       default: return null
     }
   }

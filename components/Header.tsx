@@ -83,7 +83,7 @@ export default function Header() {
     error: '抓取失败',
   }[refreshState]
 
-  const isLanding = pathname === '/home'
+  const isLanding = pathname === '/home' || pathname === '/'
   if (isLanding) return null
 
   return (
@@ -136,11 +136,18 @@ export default function Header() {
             </button>
 
             <Link href="/community" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition shrink-0">
-              社区
+               社区
+            </Link>
+
+            <Link href="/chat" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:opacity-90 transition shrink-0 shadow-sm">
+               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+               </svg>
+               创作
             </Link>
 
             <Link href="/subscribe" className="hidden sm:flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition shrink-0">
-              订阅
+               订阅
             </Link>
 
             {/* 桌面端搜索 */}

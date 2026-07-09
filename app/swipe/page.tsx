@@ -10,7 +10,6 @@ const SwipeFeed = dynamic(() => import('@/components/swipe/SwipeFeed'), {
   loading: () => (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
       <div className="w-8 h-8 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-      <p className="mt-4 text-sm text-gray-500">IdeaHub</p>
     </div>
   ),
 })
@@ -27,10 +26,9 @@ function getUserId(): string {
   return id
 }
 
-export default function HomePage() {
+export default function SwipePage() {
   const [products, setProducts] = useState<CommunityProduct[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
   const [userId, setUserId] = useState('')
 
   useEffect(() => {
@@ -38,18 +36,13 @@ export default function HomePage() {
   }, [])
 
   const loadProducts = useCallback(async () => {
-    setError(false)
     try {
       const resp = await fetch('/api/community', { cache: 'no-store' })
       if (resp.ok) {
         const data = await resp.json()
         setProducts(data.products || [])
-      } else {
-        setError(true)
       }
-    } catch {
-      setError(true)
-    }
+    } catch {}
     setLoading(false)
   }, [])
 
@@ -57,37 +50,10 @@ export default function HomePage() {
     loadProducts()
   }, [loadProducts])
 
-  useEffect(() => {
-    const interval = setInterval(loadProducts, 15000)
-    return () => clearInterval(interval)
-  }, [loadProducts])
-
-  useEffect(() => {
-    const onFocus = () => loadProducts()
-    window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
-  }, [loadProducts])
-
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
-        <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-        <p className="mt-6 text-lg font-semibold text-white">IdeaHub</p>
-        <p className="mt-1 text-sm text-gray-500">加载作品...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white gap-4">
-        <p className="text-gray-300">加载失败</p>
-        <button
-          onClick={loadProducts}
-          className="px-5 py-2 text-sm font-medium bg-white/10 rounded-full hover:bg-white/20 transition"
-        >
-          重试
-        </button>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="w-8 h-8 rounded-full border-2 border-white/30 border-t-white animate-spin" />
       </div>
     )
   }
@@ -96,12 +62,12 @@ export default function HomePage() {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white gap-4">
         <p className="text-lg text-gray-300">还没有作品</p>
-        <p className="text-sm text-gray-500">让 AI 帮你生成第一个产品</p>
+        <p className="text-sm text-gray-500">还没有 AI 生成的产品</p>
         <Link
-          href="/chat"
-          className="px-5 py-2 text-sm font-medium bg-white/10 rounded-full hover:bg-white/20 transition"
+          href="/"
+          className="px-4 py-2 text-sm font-medium text-white bg-white/10 rounded-full hover:bg-white/20 transition"
         >
-          开始创作
+          去首页生成第一个
         </Link>
       </div>
     )
@@ -109,7 +75,7 @@ export default function HomePage() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      <SwipeFeed products={products} userId={userId} onRefresh={loadProducts} />
+      <SwipeFeed products={products} userId={userId} />
     </div>
   )
 }

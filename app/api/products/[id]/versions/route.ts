@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Agent } from 'undici'
 import { getProduct, addProductVersion } from '@/lib/remote-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+const agnesAgent = new Agent({
+  headersTimeout: 600000,
+  bodyTimeout: 600000,
+})
 
 const AGNES_API_KEY = process.env.AGNES_API_KEY || ''
 const AGNES_BASE_URL = 'https://apihub.agnes-ai.com/v1'
 
 interface VersionRequest {
   prompt?: string  // 用户的调整要求（为空则用原方案重新生成 v1 之后的版本）
+  html?: string    // 预先生成的 HTML（不为空时跳过 AI 生成，直接保存版本）
 }
 
 export async function POST(
@@ -21,12 +28,28 @@ export async function POST(
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
-    if (!AGNES_API_KEY) {
-      return NextResponse.json({ error: 'AGNES_API_KEY not configured' }, { status: 500 })
-    }
 
     const body: VersionRequest = await req.json().catch(() => ({}))
     const userPrompt = (body.prompt || '').trim()
+    const directHtml = (body.html || '').trim()
+
+    // 如果有直接传入的 HTML，跳过 AI 生成，直接保存版本
+    if (directHtml) {
+      const newVersion = await addProductVersion(id, directHtml, userPrompt || undefined)
+      if (!newVersion) {
+        return NextResponse.json({ error: 'Failed to save version' }, { status: 500 })
+      }
+      return NextResponse.json({
+        success: true,
+        version: newVersion,
+        currentVersion: newVersion.version,
+        generatedHtml: directHtml,
+      })
+    }
+
+    if (!AGNES_API_KEY) {
+      return NextResponse.json({ error: 'AGNES_API_KEY not configured' }, { status: 500 })
+    }
 
     const featuresText = (product.coreFeatures || []).map((f, i) => `${i + 1}. ${f}`).join('\n')
 
@@ -71,6 +94,8 @@ ${featuresText}
         ],
         temperature: 0.8,
       }),
+      // @ts-expect-error undici-specific option
+      dispatcher: agnesAgent,
     })
 
     if (!response.ok) {
