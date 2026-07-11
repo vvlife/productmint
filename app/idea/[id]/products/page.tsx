@@ -19,7 +19,7 @@ export default function IdeaProductsPage() {
           const data = await resp.json()
           setProducts(data.products || [])
         }
-      } catch {} finally {
+      } catch { /* ignore */ } finally {
         setLoading(false)
       }
     }

@@ -33,7 +33,7 @@ export default function CommunityPage() {
         const data = await resp.json()
         setProducts(data.products || [])
       }
-    } catch {}
+    } catch { /* ignore */ }
     setLoading(false)
   }, [])
 
@@ -61,7 +61,7 @@ export default function CommunityPage() {
           .map((p, i) => ({ ...p, rank: i + 1 }))
         )
       }
-    } catch {}
+    } catch { /* ignore */ }
     setVotingId(null)
   }
 

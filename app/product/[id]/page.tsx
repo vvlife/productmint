@@ -24,7 +24,7 @@ export default function ProductPage() {
           const data = await resp.json()
           setProduct(data.product || null)
         }
-      } catch {} finally {
+      } catch { /* ignore */ } finally {
         setLoading(false)
       }
     }
@@ -41,7 +41,7 @@ export default function ProductPage() {
         if (stored) {
           setBrainstormSessions(JSON.parse(stored))
         }
-      } catch {}
+      } catch { /* ignore */ }
     }
     loadBrainstormSessions()
   }, [product])
@@ -53,7 +53,7 @@ export default function ProductPage() {
     try {
       await fetch(`/api/products/${product.id}`, { method: 'DELETE' })
       router.push('/')
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setDeleting(false)
     }
   }
@@ -73,7 +73,7 @@ export default function ProductPage() {
           setProduct(prev => prev ? { ...prev, generatedHtml: data.generatedHtml } : null)
         }
       }
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setGenerating(false)
     }
   }
@@ -100,7 +100,7 @@ export default function ProductPage() {
         // 跳转到 brainstorm 页面
         router.push(`/brainstorm/${session.id}`)
       }
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setStartingBrainstorm(false)
     }
   }

@@ -36,7 +36,7 @@ export default function CollectionPage() {
           setRelatedIdeas(related)
         }
       }
-    } catch {}
+    } catch { /* ignore */ }
     setLoading(false)
   }, [id])
 

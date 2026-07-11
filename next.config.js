@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  turbopack: undefined,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },

@@ -138,7 +138,7 @@ async function saveProduct(product: any): Promise<string> {
         body: JSON.stringify(store),
       })
     }
-  } catch {}
+  } catch { /* ignore */ }
 
   return product.id
 }

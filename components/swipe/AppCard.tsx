@@ -47,7 +47,7 @@ export default function AppCard({
         setVotes(data.votes)
         setHasVoted(data.hasVoted)
       }
-    } catch {}
+    } catch { /* ignore */ }
     setVoting(false)
   }, [product.id, userId, voting])
 
@@ -57,7 +57,7 @@ export default function AppCard({
       await navigator.clipboard.writeText(url)
       setShowCopied(true)
       setTimeout(() => setShowCopied(false), 2000)
-    } catch {}
+    } catch { /* ignore */ }
   }, [product.id])
 
   // Fullscreen swipe handlers
@@ -140,13 +140,13 @@ export default function AppCard({
 
         {/* Touch capture for swipe zones */}
         <div
-          className="absolute inset-y-0 left-0 w-16 z-20"
+          className="absolute inset-y-0 left-0 w-16 z-30"
           onTouchStart={fsHandleTouchStart}
           onTouchMove={fsHandleTouchMove}
           onTouchEnd={fsHandleTouchEnd}
         />
         <div
-          className="absolute inset-y-0 right-0 w-16 z-20"
+          className="absolute inset-y-0 right-0 w-16 z-30"
           onTouchStart={fsHandleTouchStart}
           onTouchMove={fsHandleTouchMove}
           onTouchEnd={fsHandleTouchEnd}
@@ -178,9 +178,9 @@ export default function AppCard({
   }
 
   return (
-    <div className="relative w-full h-full bg-black overflow-hidden select-none touch-none">
+    <div className="relative w-full h-full bg-black overflow-hidden select-none touch-none z-10">
       {/* Background blur */}
-      <div className="absolute inset-0 z-10">
+      <div className="absolute inset-0 z-[1]">
         <iframe
           title={product.name + '_bg'}
           src={shouldLoad ? `/p/${product.id}` : undefined}
@@ -191,7 +191,7 @@ export default function AppCard({
       </div>
 
       {/* App frame */}
-      <div className="absolute inset-0 flex items-center justify-center p-5 z-20" style={{ paddingBottom: '180px' }}>
+      <div className="absolute inset-0 flex items-center justify-center p-5 z-10" style={{ paddingBottom: '180px' }}>
         <div
           className="w-full h-full max-w-[420px] relative"
           style={{ maxHeight: 'calc(100vh - 200px)' }}
@@ -209,7 +209,7 @@ export default function AppCard({
       </div>
 
       {/* Swipe indicator */}
-      <div className="absolute right-5 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-0.5 pointer-events-none">
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-0.5 pointer-events-none">
         <svg className="w-5 h-5 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 15l7-7 7 7" />
         </svg>
@@ -224,7 +224,7 @@ export default function AppCard({
       {/* Bottom info */}
       <Link
         href={`/product/${product.id}`}
-        className="absolute bottom-0 left-0 right-0 z-25 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-28 pb-5 px-5 block"
+        className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-28 pb-5 px-5 block"
       >
         <div className="max-w-lg">
           <h2 className="text-xl font-bold text-white drop-shadow-lg">{product.name}</h2>
@@ -241,7 +241,7 @@ export default function AppCard({
       </Link>
 
       {/* Right action buttons */}
-      <div className="absolute right-4 z-30 flex flex-col items-center gap-4 pointer-events-none" style={{ bottom: 'calc(180px + 16px)' }}>
+      <div className="absolute right-4 z-20 flex flex-col items-center gap-4 pointer-events-none" style={{ bottom: 'calc(180px + 16px)' }}>
         <div className="flex flex-col items-center gap-1 pointer-events-auto">
           <button
             onClick={handleVote}

@@ -91,7 +91,7 @@ export default function PreviewPage({ params }: { params: Promise<{ token: strin
             })
           }
         }
-      } catch {}
+      } catch { /* ignore */ }
 
       setProgress(100)
       setStage('生成完成')

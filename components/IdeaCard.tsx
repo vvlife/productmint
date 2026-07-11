@@ -42,7 +42,7 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
             setFirstProduct(products[0] || null)
           }
         }
-      } catch {}
+      } catch { /* ignore */ }
     }
     loadProducts()
     return () => { cancelled = true }
@@ -70,7 +70,7 @@ export default function IdeaCard({ idea }: IdeaCardProps) {
               rel={idea.sourceUrl ? 'noopener noreferrer' : undefined}
               className="block"
             >
-              <h3 className="text-[15px] font-medium text-gray-900 hover:text-blue-600-400 transition leading-snug">
+              <h3 className="text-[15px] font-medium text-gray-900 hover:text-blue-600 transition leading-snug">
                 {idea.title}
               </h3>
             </a>

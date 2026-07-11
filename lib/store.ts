@@ -1,6 +1,8 @@
 import type { Idea, Collection, CrawlResponse, CrawlStats, FeedResponse } from './types'
-import { crawlAll } from './crawlers'
+import { crawlAllFeeds } from './rss-fetcher'
 import { clusterIdeas } from './cluster'
+import { filterAds } from './filter'
+import { categorize } from './categorize'
 
 // ── In-memory cache (per serverless instance) ─────────────────
 let _ideas: Idea[] = []
@@ -13,7 +15,20 @@ export async function triggerCrawl(): Promise<{
   collections: Collection[]
   response: CrawlResponse
 }> {
-  const { ideas: newIdeas, stats } = await crawlAll()
+  const rawIdeas = await crawlAllFeeds()
+  const filtered = filterAds(rawIdeas)
+
+  // Convert RawIdea → Idea
+  const newIdeas: Idea[] = filtered.map((raw, i) => ({
+    id: `crawl-${Date.now()}-${i}`,
+    title: raw.title,
+    description: raw.description,
+    platform: raw.platform,
+    sourceUrl: raw.sourceUrl,
+    publishedAt: raw.publishedAt,
+    heat: raw.heat,
+    category: categorize(raw.title, raw.description),
+  }))
 
   // Merge with existing (dedup by sourceUrl + title)
   const existingUrls = new Set(_ideas.map(i => i.sourceUrl))
@@ -26,20 +41,25 @@ export async function triggerCrawl(): Promise<{
   const allIdeas = [..._ideas, ...uniqueNew]
   const { ideas: clusteredIdeas, collections: newCollections } = clusterIdeas(allIdeas, 0.4)
 
-  // Update cache
   _ideas = clusteredIdeas
   _collections = newCollections
   const crawledAt = new Date().toISOString()
   _lastCrawlAt = crawledAt
 
-  stats.collectionsFormed = newCollections.length
+  const stats: CrawlStats = {
+    totalFetched: rawIdeas.length,
+    filteredCount: rawIdeas.length - filtered.length,
+    byPlatform: {},
+    collectionsFormed: newCollections.length,
+    errors: [],
+  }
 
   return {
     ideas: clusteredIdeas,
     collections: newCollections,
     response: {
       success: true,
-      message: `Crawled ${stats.totalFetched} items. ${uniqueNew.length} new. ${stats.errors.length} errors.`,
+      message: `Crawled ${stats.totalFetched} items. ${uniqueNew.length} new. ${stats.filteredCount} filtered.`,
       crawledAt,
       newItems: uniqueNew.length,
       stats,
@@ -49,7 +69,6 @@ export async function triggerCrawl(): Promise<{
 
 // ── Get current cached data (auto-crawl if empty) ─────────────
 export async function getFeed(category?: string): Promise<FeedResponse> {
-  // Auto-crawl if cache is empty
   if (_ideas.length === 0) {
     await triggerCrawl()
   }
@@ -85,7 +104,6 @@ export async function search(query: string) {
   const q = query.toLowerCase().trim()
   if (!q) return { results: [], total: 0 }
 
-  // Auto-crawl if cache is empty
   if (_ideas.length === 0) {
     await triggerCrawl()
   }

@@ -82,7 +82,7 @@ export default function AnalysisModal({
             setExistingProducts(data.products || [])
           }
         }
-      } catch {} finally {
+      } catch { /* ignore */ } finally {
         if (!cancelled) setLoadingProducts(false)
       }
     }
@@ -107,7 +107,7 @@ export default function AnalysisModal({
             ).join('\n')
           }
         }
-      } catch {}
+      } catch { /* ignore */ }
 
       const resp = await fetch('/api/analyze', {
         method: 'POST',
@@ -143,7 +143,7 @@ export default function AnalysisModal({
             createdAt: new Date().toISOString(),
           }),
         })
-      } catch {}
+      } catch { /* ignore */ }
     } catch (e) {
       setError(e instanceof Error ? e.message : '未知错误')
       setStep('idle')

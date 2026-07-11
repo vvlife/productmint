@@ -1,18 +1,17 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import Header from '@/components/Header'
-import LandingHeader from '@/components/LandingHeader'
-import Footer from '@/components/Footer'
+import { Header, Footer } from '@/components/layout'
 
 export const metadata: Metadata = {
-  title: 'IdeaHub',
-  description: '从需求到产品，一键生成。自动抓取中文科技媒体动态，AI分析生成产品方案，支持多人协作讨论，一键提交AI产品排行榜。',
+  title: 'IdeaHub · 刷网页的 TikTok',
+  description: 'AI 生成的可交互网页，上下滑动无限刷。发现好产品，一键创作你的作品。',
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -22,12 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="bg-gray-50 text-gray-900 antialiased min-h-screen">
-        <LandingHeader />
+      <body className="bg-black text-gray-900 antialiased min-h-screen">
         <Header />
-        <main className="mx-auto max-w-3xl px-4 py-6">
-          {children}
-        </main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

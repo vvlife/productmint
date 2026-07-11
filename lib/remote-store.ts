@@ -129,6 +129,14 @@ export async function deleteProduct(id: string): Promise<boolean> {
   return saveStore(store)
 }
 
+export async function updateProduct(id: string, updates: Partial<Product>): Promise<boolean> {
+  const store = await fetchStore()
+  const product = store.products.find(p => p.id === id)
+  if (!product) return false
+  Object.assign(product, updates)
+  return saveStore(store)
+}
+
 // ── 分析记录 CRUD ──────────────────────────────────────────────
 
 export async function getAnalysisByIdea(ideaId: string): Promise<AnalysisRecord[]> {

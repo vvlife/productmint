@@ -42,7 +42,7 @@ export default function BrainstormPage() {
           return
         }
       }
-    } catch {}
+    } catch { /* ignore */ }
 
     // fallback: 从 localStorage 读取 session 数据
     try {
@@ -50,7 +50,7 @@ export default function BrainstormPage() {
       if (allSessions[sessionId]) {
         setSession(allSessions[sessionId])
       }
-    } catch {}
+    } catch { /* ignore */ }
     setLoading(false)
   }, [sessionId])
 
@@ -89,7 +89,7 @@ export default function BrainstormPage() {
       })
       setContent('')
       await fetchSession()
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setSubmitting(false)
     }
   }
@@ -105,7 +105,7 @@ export default function BrainstormPage() {
         setShowMergeResult(true)
         await fetchSession()
       }
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setClosing(false)
     }
   }
@@ -149,7 +149,7 @@ export default function BrainstormPage() {
         // 跳转到产品页
         router.push(`/product/${session.productId}`)
       }
-    } catch {} finally {
+    } catch { /* ignore */ } finally {
       setRegenerating(false)
     }
   }

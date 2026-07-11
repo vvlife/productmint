@@ -88,7 +88,7 @@ export default function ProductAppPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentVersion: version }),
       })
-    } catch {}
+    } catch { /* ignore */ }
   }
 
   // 部署到公网

@@ -39,7 +39,7 @@ export default function ChatPage() {
       if (data.results?.length > 0) {
         relatedNeeds = data.results.slice(0, 5).map((r: any) => r.title || r.description || '')
       }
-    } catch {}
+    } catch { /* ignore */ }
 
     // 2) 尝试从 feed 也获取需求
     let feedIdeas: Idea[] = []
@@ -47,7 +47,7 @@ export default function ChatPage() {
       const feedResp = await fetch('/api/feed', { cache: 'no-store' })
       const feedData = await feedResp.json()
       feedIdeas = (feedData.ideas || []).slice(0, 5)
-    } catch {}
+    } catch { /* ignore */ }
 
     // 聚合需求描述
     const aggregatedNeeds = [

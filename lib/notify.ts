@@ -29,7 +29,7 @@ function load(): AppNotification[] {
       cache = JSON.parse(raw) as AppNotification[]
       return cache
     }
-  } catch {}
+  } catch { /* ignore */ }
   cache = []
   return cache
 }
@@ -40,7 +40,7 @@ function persist(list: AppNotification[]) {
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
     }
-  } catch {}
+  } catch { /* ignore */ }
   listeners.forEach(l => l())
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(EVENT_NAME))

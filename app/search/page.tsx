@@ -25,7 +25,7 @@ function SearchContent() {
         const data = await resp.json()
         setResults(data.results || [])
       }
-    } catch {}
+    } catch { /* ignore */ }
     setLoading(false)
   }, [])
 
