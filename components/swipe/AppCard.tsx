@@ -33,13 +33,26 @@ export default function AppCard({
   const fsTouch = useRef({ startY: 0, moved: false })
   const lock = useRef(false)
   const lastSwipe = useRef(0)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
-  // Reset loaded state when product changes or shouldLoad changes
+  // Reset loaded state when product changes
   useEffect(() => {
     if (shouldLoad) {
       setLoaded(false)
     }
   }, [product.id, shouldLoad])
+
+  // Stop audio when becoming inactive: remove src to silence the iframe
+  useEffect(() => {
+    if (!isActive) {
+      setLoaded(false)
+      // Force iframe to unload by clearing its src
+      const iframe = iframeRef.current
+      if (iframe && iframe.src) {
+        iframe.src = 'about:blank'
+      }
+    }
+  }, [isActive])
 
   const handleVote = useCallback(async () => {
     if (voting || !userId) return
@@ -116,8 +129,9 @@ export default function AppCard({
     return () => window.removeEventListener('wheel', handler)
   }, [isFullscreen, onFullscreenNext, onFullscreenPrev])
 
-  const iframe = (
+  const iframeEl = (
     <iframe
+      ref={iframeRef}
       title={product.name}
       src={shouldLoad ? `/p/${product.id}` : undefined}
       className="w-full h-full border-0"
@@ -131,7 +145,7 @@ export default function AppCard({
   if (isFullscreen && typeof document !== 'undefined') {
     return createPortal(
       <div className="fixed inset-0 bg-black select-none z-[100]">
-        <div className="absolute inset-0">{iframe}</div>
+        <div className="absolute inset-0">{iframeEl}</div>
 
         {/* Swipe zones (left & right edges, so center is tappable for game) */}
         <div
@@ -185,15 +199,17 @@ export default function AppCard({
   // Card mode (TikTok style — default, non-fullscreen)
   return (
     <div className="relative w-full h-full bg-black overflow-hidden select-none touch-none z-10">
-      {/* Blurred bg */}
+      {/* Blurred bg — only load when active to save resources & prevent audio leak */}
       <div className="absolute inset-0 z-[1]">
-        <iframe
-          title={product.name + '_bg'}
-          src={shouldLoad ? `/p/${product.id}` : undefined}
-          className="w-full h-full border-0 pointer-events-none opacity-40 scale-110 blur-md"
-          sandbox="allow-scripts"
-          aria-hidden
-        />
+        {shouldLoad ? (
+          <iframe
+            title={product.name + '_bg'}
+            src={shouldLoad ? `/p/${product.id}` : undefined}
+            className="w-full h-full border-0 pointer-events-none opacity-40 scale-110 blur-md"
+            sandbox="allow-scripts"
+            aria-hidden
+          />
+        ) : null}
       </div>
 
       {/* App preview frame */}
@@ -203,7 +219,7 @@ export default function AppCard({
             className="w-full h-full rounded-[24px] overflow-hidden border border-white/15 shadow-[0_0_80px_rgba(0,0,0,0.7)] bg-gradient-to-br from-gray-900 to-gray-800 cursor-pointer"
             onClick={onRequestFullscreen}
           >
-            {shouldLoad ? iframe : <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center"><div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white/30 animate-spin" /></div>}
+            {shouldLoad ? iframeEl : <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center"><div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-white/30 animate-spin" /></div>}
             {!loaded && shouldLoad && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 rounded-[24px] z-10">
                 <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin" />

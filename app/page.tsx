@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import type { CommunityProduct } from '@/lib/types'
 
@@ -31,17 +31,35 @@ export default function HomePage() {
   const [products, setProducts] = useState<CommunityProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState('')
+  const viewedAllRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     setUserId(getUserId())
   }, [])
 
-  const loadProducts = useCallback(async () => {
+  const loadProducts = useCallback(async (excludeIds?: string[]) => {
     try {
-      const resp = await fetch('/api/community', { cache: 'no-store' })
+      const params = new URLSearchParams()
+      if (excludeIds && excludeIds.length > 0) {
+        params.set('exclude', excludeIds.join(','))
+      }
+      const url = '/api/community' + (params.toString() ? '?' + params.toString() : '')
+      const resp = await fetch(url, { cache: 'no-store' })
       if (resp.ok) {
         const data = await resp.json()
-        setProducts(data.products || [])
+        const newProducts = data.products || []
+        if (excludeIds && excludeIds.length > 0 && newProducts.length > 0) {
+          // Append new products after existing ones for "infinite refresh" pattern
+          setProducts(prev => {
+            // Avoid duplicates
+            const existingIds = new Set(prev.map((p: CommunityProduct) => p.id))
+            const fresh = newProducts.filter((p: CommunityProduct) => !existingIds.has(p.id))
+            return [...prev, ...fresh]
+          })
+        } else {
+          // Initial load or full refresh
+          setProducts(newProducts)
+        }
       }
     } catch { /* ignore */ }
     setLoading(false)
@@ -56,6 +74,10 @@ export default function HomePage() {
     const handler = () => loadProducts()
     window.addEventListener('product-created', handler)
     return () => window.removeEventListener('product-created', handler)
+  }, [loadProducts])
+
+  const handleRefresh = useCallback((excludeIds: string[]) => {
+    loadProducts(excludeIds)
   }, [loadProducts])
 
   if (loading) {
@@ -92,7 +114,7 @@ export default function HomePage() {
 
   return (
     <div className="fixed inset-0 bg-black">
-      <SwipeFeed products={products} userId={userId} onRefresh={loadProducts} />
+      <SwipeFeed products={products} userId={userId} onRefresh={handleRefresh} />
     </div>
   )
 }
